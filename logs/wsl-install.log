@@ -1,0 +1,53 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260504194933
+Username: DESKTOP-FKSAJNL\demir
+RunAs User: DESKTOP-FKSAJNL\demir
+Configuration Name: 
+Machine: DESKTOP-FKSAJNL (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoExit -NoProfile -ExecutionPolicy Bypass -File C:\Users\demir\OneDrive\Documents\New project 2\tools\install_wsl_ubuntu_vm.ps1
+Process ID: 19600
+PSVersion: 5.1.26100.8115
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8115
+BuildVersion: 10.0.26100.8115
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+WSL ve sanal makine altyapisi aciliyor...
+
+Deployment Image Servicing and Management tool
+Version: 10.0.26100.5074
+
+Image Version: 10.0.26200.8246
+
+Enabling feature(s)
+[==========================100.0%==========================]
+The operation completed successfully.
+
+Deployment Image Servicing and Management tool
+Version: 10.0.26100.5074
+
+Image Version: 10.0.26200.8246
+
+Enabling feature(s)
+[==========================100.0%==========================]
+The operation completed successfully.
+Downloading: Windows Subsystem for Linux 2.6.3
+Installing: Windows Subsystem for Linux 2.6.3
+Windows Subsystem for Linux 2.6.3 has been installed.
+İstenen işlem başarılı. Değişiklikler sistem yeniden önyükleninceye kadar etkili olmayacak.
+İstenen işlem başarılı. Değişiklikler sistem yeniden önyükleninceye kadar etkili olmayacak.
+WSL 2 ile temel farklılıklar hakkında bilgi için lütfen https://aka.ms/wsl2 adresini ziyaret edin.
+İşlem başarıyla tamamlandı.
+
+Ilk asama tamam.
+Simdi Windows'u yeniden baslatin.
+Yeniden baslattiktan sonra bu komutu calistirin:
+powershell -ExecutionPolicy Bypass -File .\tools\provision_wsl_model_b.ps1
+**********************
+Windows PowerShell transcript end
+End time: 20260504195145
+**********************

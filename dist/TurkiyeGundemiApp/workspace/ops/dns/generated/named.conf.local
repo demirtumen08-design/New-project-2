@@ -1,0 +1,5 @@
+zone "turkiyegundemi.com" {
+    type master;
+    file "/etc/bind/zones/db.turkiyegundemi.com";
+    allow-transfer { none; };
+};

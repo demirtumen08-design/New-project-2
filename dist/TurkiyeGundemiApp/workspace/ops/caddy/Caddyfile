@@ -1,0 +1,7 @@
+turkiyegundemi.com, www.turkiyegundemi.com {
+    root * /var/www/turkiyegundemi/public
+    encode zstd gzip
+    file_server
+    header /assets/* Cache-Control "public, max-age=31536000, immutable"
+    header Cache-Control "public, max-age=60, stale-while-revalidate=300"
+}

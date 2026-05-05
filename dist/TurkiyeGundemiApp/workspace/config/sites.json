@@ -1,0 +1,93 @@
+{
+  "sites": {
+    "medyafaresi": {
+      "name": "Medyafaresi",
+      "domain": "medyafaresi.com",
+      "base_url": "https://www.medyafaresi.com",
+      "type": "existing_portal",
+      "language": "tr",
+      "sitemaps": [
+        "https://www.medyafaresi.com/export/sitemap",
+        "https://www.medyafaresi.com/export/newsmap",
+        "https://www.medyafaresi.com/export/gallerymap",
+        "https://www.medyafaresi.com/export/imagemap",
+        "https://www.medyafaresi.com/export/categorymap"
+      ],
+      "competitors": [
+        "https://t24.com.tr",
+        "https://www.sozcu.com.tr",
+        "https://www.cumhuriyet.com.tr",
+        "https://www.diken.com.tr",
+        "https://www.birgun.net"
+      ],
+      "categories": [
+        {"slug": "son-dakika", "name": "Son Dakika"},
+        {"slug": "gundem", "name": "Gündem"},
+        {"slug": "medya", "name": "Medya"},
+        {"slug": "reyting", "name": "Reyting"},
+        {"slug": "magazin", "name": "Magazin"},
+        {"slug": "ekonomi", "name": "Ekonomi"},
+        {"slug": "saglik", "name": "Sağlık"},
+        {"slug": "yasam", "name": "Yaşam"}
+      ],
+      "thresholds": {
+        "homepage_html_kb": 220,
+        "article_html_kb": 160,
+        "max_blocking_scripts": 12,
+        "min_news_sitemap_urls": 80,
+        "max_recent_news_age_hours": 2
+      }
+    },
+    "turkiye-gundemi": {
+      "name": "Türkiye Gündemi",
+      "domain": "turkiyegundemi.com",
+      "base_url": "https://turkiyegundemi.com",
+      "type": "new_static_portal",
+      "language": "tr",
+      "public_dir": "sites/turkiye-gundemi/public",
+      "content_file": "content/turkiye-gundemi/articles.json",
+      "dns": {
+        "mode": "self_hosted_bind9",
+        "zone": "turkiyegundemi.com",
+        "ttl": 300,
+        "primary_ns": "ns1.turkiyegundemi.com",
+        "secondary_ns": "ns2.turkiyegundemi.com",
+        "soa_email": "dns@turkiyegundemi.com",
+        "primary_ipv4": "176.88.74.65",
+        "secondary_ipv4": "CHANGE_ME_SECONDARY_DNS_IPV4",
+        "records": [
+          {"type": "A", "name": "@", "value": "176.88.74.65"},
+          {"type": "A", "name": "www", "value": "176.88.74.65"},
+          {"type": "A", "name": "ns1", "value": "176.88.74.65"},
+          {"type": "A", "name": "ns2", "value": "SECONDARY_IPV4"},
+          {"type": "TXT", "name": "@", "value": "v=spf1 -all"},
+          {"type": "TXT", "name": "_dmarc", "value": "v=DMARC1; p=reject; adkim=s; aspf=s"},
+          {"type": "CAA", "name": "@", "flag": 0, "tag": "issue", "value": "letsencrypt.org"}
+        ]
+      },
+      "theme": {
+        "primary": "#0f4c81",
+        "accent": "#b42318",
+        "ink": "#171717",
+        "paper": "#fafafa",
+        "muted": "#667085"
+      },
+      "categories": [
+        {"slug": "son-dakika", "name": "Son Dakika"},
+        {"slug": "gundem", "name": "Gündem"},
+        {"slug": "ekonomi", "name": "Ekonomi"},
+        {"slug": "dunya", "name": "Dünya"},
+        {"slug": "teknoloji", "name": "Teknoloji"},
+        {"slug": "spor", "name": "Spor"},
+        {"slug": "kultur", "name": "Kültür"}
+      ],
+      "thresholds": {
+        "homepage_html_kb": 120,
+        "article_html_kb": 90,
+        "max_blocking_scripts": 2,
+        "min_news_sitemap_urls": 20,
+        "max_recent_news_age_hours": 1
+      }
+    }
+  }
+}

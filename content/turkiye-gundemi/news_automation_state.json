@@ -1,0 +1,110 @@
+{
+  "imported_signatures": [
+    "https://www.cumhuriyet.com.tr/turkiye/sinir-yakinlarinda-kaza-askeri-arac-duvara-carpti-2-asker-yaralandi-2501093",
+    "28ff7dbc1d0e58ed5879f91b4dc3d009f5168e32f7b7a87d44f175a77ba89415",
+    "dec7364fe9e2b7a1b3a41e9a9e7b3ffd74792e4a22d645399e0a158a23821da9",
+    "https://www.trthaber.com/haber/turkiye/igdirda-ari-saldirisinda-816-koyun-telef-oldu-943979.html",
+    "https://www.trthaber.com/haber/dunya/abd-baskani-trump-iranla-mini-bir-savas-halinde-olduklarini-soyledi-943981.html",
+    "https://www.ensonhaber.com/ak-partili-vekilden-basibos-kopek-cikisi-turkiye-kopekci-terorune-teslim-olmayacak-h1531902",
+    "https://www.cumhuriyet.com.tr/turkiye/tipi-vurdu-heyelan-yolu-kapatti-2-coban-ve-yaklasik-650-kucukbas-hayvan-yaylada-mahsur-2501092",
+    "0ad55aab94912a8107e9ddd17864b63f0f25479c37011ac1e87f1ebd9e620f4d",
+    "https://www.ensonhaber.com/ak-partiden-yeni-paylasim-daima-milletle-h1531915",
+    "c3dcd0b8f9d614eccf1af00c9b04a1d5828b9c302f6db171b847d2ffa5dafbf7",
+    "https://www.trthaber.com/haber/turkiye/karabukte-kontrolden-cikan-otomobil-apartman-bahcesine-dustu-2-yarali-943983.html",
+    "https://www.trthaber.com/haber/dunya/zelenski-6-mayistan-itibaren-gecici-ateskes-ilan-ettiklerini-duyurdu-943980.html",
+    "df0b25b26858528795d6f45ae9b602b09aecf7a65be46efb7422a4756e03c305",
+    "e56b8410ddf37686d8487d780b82bac17d26391a082b9a81ac5fbe0cb53ac97b",
+    "bb04c71fb407b2485d45bce4880c3abeea0e7bd36a4623924179002b63a0cf07",
+    "https://www.trthaber.com/haber/dunya/bae-saldirilar-sonrasi-hava-sahasini-bir-hafta-sureyle-kismen-trafige-kapatti-943977.html",
+    "ecbdbc6049fc6f004086597e02d62586f3961f8b25b198655476861998b0cd20",
+    "e37a493d3a57e744d6b2ac360739934fea490c1a9c08bde783ff02597cc102ef",
+    "609aa5f4c386dd0cb7c77978964a725d8caed0294930aa012426b1e277daa9ef",
+    "3b3bfa7038d3b5c5b76b7a5e345ed95c737dc70b3f1e977bad689fc41b0d58a0",
+    "https://www.sozcu.com.tr/kedinin-yuzune-sprey-sikan-market-calisani-gozaltina-alindi-p316809",
+    "e9f685dab4e39dbf9e9f864a286cfdb4cea2896e20c8e8d5cba2e8f1bb3e0b7c",
+    "d42d9d31faedc9b11517022370d535dd97578b734ac33c0f4f7cd51169c5b67e",
+    "https://www.trthaber.com/haber/dunya/ozgurluk-filosu-koalisyonuna-ait-4-teknenin-etrafinda-askeri-hareketlilik-gozlemleniyor-943978.html",
+    "https://www.cumhuriyet.com.tr/turkiye/supheli-olum-yabanci-uyruklu-sahsin-cesedi-evinde-bulundu-2501091",
+    "89410eb9d8774f5e5c0df12c05657108a0de4daa0f7e46c6aa64e13c5ecf3480",
+    "https://www.trthaber.com/haber/dunya/beyaz-saray-yakinlarindaki-olayda-silahli-bir-kisi-polis-tarafindan-vuruldu-943982.html",
+    "https://www.ntv.com.tr/turkiye/son-dakika-deprem-mi-oldu-az-once-deprem-nerede-oldu-istanbul-ankara-izmir-ve-il-il-afad-son-depremler-05-mayis-2026-1722867"
+  ],
+  "last_import_at": "2026-05-05T02:05:34+03:00",
+  "last_source_status": [
+    {
+      "source": "TRT Haber Son Dakika",
+      "status": "ok",
+      "message": "60 haber alindi"
+    },
+    {
+      "source": "TRT Haber Gundem",
+      "status": "ok",
+      "message": "60 haber alindi"
+    },
+    {
+      "source": "TRT Haber Turkiye",
+      "status": "ok",
+      "message": "60 haber alindi"
+    },
+    {
+      "source": "TRT Haber Ekonomi",
+      "status": "ok",
+      "message": "60 haber alindi"
+    },
+    {
+      "source": "TRT Haber Dunya",
+      "status": "ok",
+      "message": "60 haber alindi"
+    },
+    {
+      "source": "TRT Haber Spor",
+      "status": "ok",
+      "message": "60 haber alindi"
+    },
+    {
+      "source": "TRT Haber Bilim Teknoloji",
+      "status": "ok",
+      "message": "60 haber alindi"
+    },
+    {
+      "source": "NTV Son Dakika",
+      "status": "ok",
+      "message": "10 haber alindi"
+    },
+    {
+      "source": "Sözcü Son Dakika",
+      "status": "ok",
+      "message": "20 haber alindi"
+    },
+    {
+      "source": "Sözcü Gündem",
+      "status": "ok",
+      "message": "50 haber alindi"
+    },
+    {
+      "source": "Sözcü Ekonomi",
+      "status": "ok",
+      "message": "50 haber alindi"
+    },
+    {
+      "source": "Cumhuriyet",
+      "status": "ok",
+      "message": "100 haber alindi"
+    },
+    {
+      "source": "Habertürk",
+      "status": "ok",
+      "message": "100 haber alindi"
+    },
+    {
+      "source": "Ensonhaber Gündem",
+      "status": "ok",
+      "message": "25 haber alindi"
+    },
+    {
+      "source": "Medyafaresi",
+      "status": "ok",
+      "message": "50 haber alindi"
+    }
+  ]
+}

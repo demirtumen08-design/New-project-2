@@ -1,0 +1,101 @@
+{
+  "sources": [
+    {
+      "enabled": true,
+      "name": "TRT Haber Son Dakika",
+      "url": "https://www.trthaber.com/sondakika_articles.rss",
+      "category": "son-dakika"
+    },
+    {
+      "enabled": true,
+      "name": "TRT Haber Gündem",
+      "url": "https://www.trthaber.com/gundem_articles.rss",
+      "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "TRT Haber Türkiye",
+      "url": "https://www.trthaber.com/turkiye_articles.rss",
+      "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "TRT Haber Ekonomi",
+      "url": "https://www.trthaber.com/ekonomi_articles.rss",
+      "category": "ekonomi"
+    },
+    {
+      "enabled": true,
+      "name": "TRT Haber Dünya",
+      "url": "https://www.trthaber.com/dunya_articles.rss",
+      "category": "dunya"
+    },
+    {
+      "enabled": true,
+      "name": "TRT Haber Spor",
+      "url": "https://www.trthaber.com/spor_articles.rss",
+      "category": "spor"
+    },
+    {
+      "enabled": true,
+      "name": "TRT Haber Bilim Teknoloji",
+      "url": "https://www.trthaber.com/bilim_teknoloji_articles.rss",
+      "category": "teknoloji"
+    },
+    {
+      "enabled": true,
+      "name": "NTV Son Dakika",
+      "url": "https://www.ntv.com.tr/son-dakika.rss",
+      "category": "son-dakika"
+    },
+    {
+      "enabled": true,
+      "name": "Sözcü Son Dakika",
+      "url": "https://www.sozcu.com.tr/feeds-son-dakika",
+      "category": "son-dakika"
+    },
+    {
+      "enabled": true,
+      "name": "Sözcü Gündem",
+      "url": "https://www.sozcu.com.tr/feeds-rss-category-gundem",
+      "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "Sözcü Ekonomi",
+      "url": "https://www.sozcu.com.tr/feeds-rss-category-ekonomi",
+      "category": "ekonomi"
+    },
+    {
+      "enabled": true,
+      "name": "Cumhuriyet",
+      "url": "https://www.cumhuriyet.com.tr/rss",
+      "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "Habertürk",
+      "url": "https://www.haberturk.com/rss",
+      "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "Ensonhaber Gündem",
+      "url": "https://www.ensonhaber.com/rss/gundem.xml",
+      "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "Medyafaresi",
+      "url": "https://www.medyafaresi.com/rss",
+      "category": "gundem"
+    }
+  ],
+  "defaults": {
+    "limit": 30,
+    "max_import_per_cycle": 3,
+    "status": "published",
+    "publish_site_after_import": true,
+    "require_live_sources": true
+  }
+}

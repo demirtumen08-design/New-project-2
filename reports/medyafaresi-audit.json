@@ -1,0 +1,364 @@
+{
+  "site": {
+    "id": "medyafaresi",
+    "name": "Medyafaresi",
+    "base_url": "https://www.medyafaresi.com"
+  },
+  "generated_at": "2026-05-04T12:53:35.308276+00:00",
+  "homepage": {
+    "url": "https://www.medyafaresi.com/",
+    "final_url": "https://www.medyafaresi.com/",
+    "status": 200,
+    "bytes": 331475,
+    "elapsed_ms": 362,
+    "title_len": 57,
+    "description_len": 146,
+    "h1_count": 1,
+    "h2_count": 1,
+    "scripts": 34,
+    "blocking_scripts": 23,
+    "stylesheets": 1,
+    "images": 48,
+    "images_without_alt": 0,
+    "lazy_images": 20,
+    "json_ld_blocks": 2,
+    "json_ld_types": [
+      "Organization",
+      "WebSite"
+    ],
+    "canonical": "https://www.medyafaresi.com",
+    "amphtml": "",
+    "cache_control": "max-age=60, no-store",
+    "cf_cache_status": "HIT",
+    "server": "cloudflare",
+    "external_domains": [
+      "ad-cdn.bilgin.pro",
+      "go.trvdp.com",
+      "img.medyafaresi.com",
+      "jsc.idealmedia.io",
+      "s.medyafaresi.com",
+      "securepubads.g.doubleclick.net",
+      "static.cloudflareinsights.com",
+      "www.googletagmanager.com",
+      "www.medyafaresi.com"
+    ],
+    "recommendations": [
+      "HTML boyutu 324 KB; hedef 220 KB altina indirilmeli.",
+      "23 potansiyel bloklayici script var; hedef 12 veya alti.",
+      "Cache-Control icinde no-store var; haber ana sayfasi icin edge cache ile tarayici cache ayrilmali."
+    ]
+  },
+  "sample_article": {
+    "url": "https://www.medyafaresi.com/haber/gazeteci-nursun-erel-gelini-seda-bakan-ile-soylesiye-katilirsa/1042369",
+    "final_url": "https://www.medyafaresi.com/haber/gazeteci-nursun-erel-gelini-seda-bakan-ile-soylesiye-katilirsa/1042369",
+    "status": 200,
+    "bytes": 291265,
+    "elapsed_ms": 408,
+    "title_len": 79,
+    "description_len": 172,
+    "h1_count": 1,
+    "h2_count": 1,
+    "scripts": 39,
+    "blocking_scripts": 28,
+    "stylesheets": 1,
+    "images": 12,
+    "images_without_alt": 0,
+    "lazy_images": 0,
+    "json_ld_blocks": 4,
+    "json_ld_types": [
+      "NewsArticle",
+      "BreadcrumbList",
+      "Organization",
+      "WebSite"
+    ],
+    "canonical": "https://www.medyafaresi.com/haber/gazeteci-nursun-erel-gelini-seda-bakan-ile-soylesiye-katilirsa/1042369",
+    "amphtml": "https://www.medyafaresi.com/amp/haber/gazeteci-nursun-erel-gelini-seda-bakan-ile-soylesiye-katilirsa/1042369",
+    "cache_control": "max-age=60, no-store",
+    "cf_cache_status": "HIT",
+    "server": "cloudflare",
+    "external_domains": [
+      "ad-cdn.bilgin.pro",
+      "go.trvdp.com",
+      "img.medyafaresi.com",
+      "jsc.idealmedia.io",
+      "s.medyafaresi.com",
+      "securepubads.g.doubleclick.net",
+      "static.cloudflareinsights.com",
+      "www.googletagmanager.com",
+      "www.medyafaresi.com"
+    ],
+    "recommendations": [
+      "HTML boyutu 284 KB; hedef 160 KB altina indirilmeli.",
+      "28 potansiyel bloklayici script var; hedef 12 veya alti.",
+      "Title uzun; mobil SERP icin 50-65 karakter araligina cekilmeli.",
+      "Meta description uzun; 140-165 karakter bandi hedeflenmeli.",
+      "Cache-Control icinde no-store var; haber ana sayfasi icin edge cache ile tarayici cache ayrilmali."
+    ]
+  },
+  "sitemaps": [
+    {
+      "url": "https://www.medyafaresi.com/export/sitemap",
+      "final_url": "https://www.medyafaresi.com/export/sitemap",
+      "status": 200,
+      "bytes": 86096,
+      "elapsed_ms": 243,
+      "loc_count": 250,
+      "sitemap_count": 0,
+      "latest_lastmod": [
+        "2026-05-04T14:31:04+03:00",
+        "2026-05-04T13:50:54+03:00",
+        "2026-05-04T13:46:10+03:00"
+      ]
+    },
+    {
+      "url": "https://www.medyafaresi.com/export/newsmap",
+      "final_url": "https://www.medyafaresi.com/export/newsmap",
+      "status": 200,
+      "bytes": 43528,
+      "elapsed_ms": 179,
+      "loc_count": 56,
+      "sitemap_count": 0,
+      "latest_lastmod": []
+    },
+    {
+      "url": "https://www.medyafaresi.com/export/gallerymap",
+      "final_url": "https://www.medyafaresi.com/export/gallerymap",
+      "status": 200,
+      "bytes": 808579,
+      "elapsed_ms": 464,
+      "loc_count": 250,
+      "sitemap_count": 0,
+      "latest_lastmod": []
+    },
+    {
+      "url": "https://www.medyafaresi.com/export/imagemap",
+      "final_url": "https://www.medyafaresi.com/export/imagemap",
+      "status": 200,
+      "bytes": 109867,
+      "elapsed_ms": 243,
+      "loc_count": 250,
+      "sitemap_count": 0,
+      "latest_lastmod": []
+    },
+    {
+      "url": "https://www.medyafaresi.com/export/categorymap",
+      "final_url": "https://www.medyafaresi.com/export/categorymap",
+      "status": 200,
+      "bytes": 1818,
+      "elapsed_ms": 208,
+      "loc_count": 9,
+      "sitemap_count": 0,
+      "latest_lastmod": [
+        "2026-05-04T13:40:29+03:00",
+        "2026-05-04T11:33:52+03:00",
+        "2026-05-04T11:22:28+03:00"
+      ]
+    }
+  ],
+  "competitors": [
+    {
+      "url": "https://t24.com.tr/",
+      "final_url": "https://t24.com.tr/",
+      "status": 200,
+      "bytes": 314199,
+      "elapsed_ms": 452,
+      "title_len": 67,
+      "description_len": 26,
+      "h1_count": 0,
+      "h2_count": 21,
+      "scripts": 58,
+      "blocking_scripts": 54,
+      "stylesheets": 13,
+      "images": 213,
+      "images_without_alt": 46,
+      "lazy_images": 125,
+      "json_ld_blocks": 1,
+      "json_ld_types": [
+        "NewsMediaOrganization"
+      ],
+      "canonical": "https://t24.com.tr",
+      "amphtml": "",
+      "cache_control": "public, max-age=300",
+      "cf_cache_status": "DYNAMIC",
+      "server": "cloudflare",
+      "external_domains": [
+        "cdn.jsdelivr.net",
+        "cdn2.bildirt.com",
+        "cdnjs.cloudflare.com",
+        "code.jquery.com",
+        "fonts.cdnfonts.com",
+        "fonts.googleapis.com",
+        "live26.t24.com.tr",
+        "mc.yandex.ru",
+        "media-cdn.t24.com.tr",
+        "media-cdn.t24.com.trhttps",
+        "www.dailymotion.com",
+        "www.googletagmanager.com"
+      ],
+      "recommendations": [
+        "HTML boyutu 307 KB; hedef 220 KB altina indirilmeli.",
+        "54 potansiyel bloklayici script var; hedef 12 veya alti.",
+        "Sayfada tam bir adet H1 olmali.",
+        "Gorsellerde alt metin kapsami dusuk; haber gorselleri icin aciklayici alt metin uretin."
+      ]
+    },
+    {
+      "url": "https://www.sozcu.com.tr/",
+      "final_url": "https://www.sozcu.com.tr/",
+      "status": 200,
+      "bytes": 267817,
+      "elapsed_ms": 264,
+      "title_len": 76,
+      "description_len": 150,
+      "h1_count": 0,
+      "h2_count": 0,
+      "scripts": 22,
+      "blocking_scripts": 12,
+      "stylesheets": 4,
+      "images": 126,
+      "images_without_alt": 4,
+      "lazy_images": 107,
+      "json_ld_blocks": 1,
+      "json_ld_types": [],
+      "canonical": "https://www.sozcu.com.tr",
+      "amphtml": "",
+      "cache_control": "public, max-age=60",
+      "cf_cache_status": "HIT",
+      "server": "cloudflare",
+      "external_domains": [
+        "cdn.membrana.media",
+        "fws.forinvestcdn.com",
+        "securepubads.g.doubleclick.net",
+        "sozcu01.sozcucdn.com",
+        "www.sozcu.com.tr"
+      ],
+      "recommendations": [
+        "HTML boyutu 262 KB; hedef 220 KB altina indirilmeli.",
+        "Title uzun; mobil SERP icin 50-65 karakter araligina cekilmeli.",
+        "Sayfada tam bir adet H1 olmali."
+      ]
+    },
+    {
+      "url": "https://www.cumhuriyet.com.tr/",
+      "final_url": "https://www.cumhuriyet.com.tr/",
+      "status": 200,
+      "bytes": 514730,
+      "elapsed_ms": 372,
+      "title_len": 84,
+      "description_len": 124,
+      "h1_count": 0,
+      "h2_count": 10,
+      "scripts": 21,
+      "blocking_scripts": 17,
+      "stylesheets": 5,
+      "images": 160,
+      "images_without_alt": 54,
+      "lazy_images": 129,
+      "json_ld_blocks": 1,
+      "json_ld_types": [
+        "Organization"
+      ],
+      "canonical": "https://www.cumhuriyet.com.tr",
+      "amphtml": "",
+      "cache_control": "",
+      "cf_cache_status": "DYNAMIC",
+      "server": "cloudflare",
+      "external_domains": [
+        "cdn-script.com",
+        "cdn.netmera-web.com",
+        "fonts.bunny.net",
+        "fonts.cdnfonts.com",
+        "mc.yandex.ru",
+        "media.cumhuriyet.com.tr",
+        "securepubads.g.doubleclick.net",
+        "www.cumhuriyet.com.tr",
+        "www.googletagmanager.com"
+      ],
+      "recommendations": [
+        "HTML boyutu 503 KB; hedef 220 KB altina indirilmeli.",
+        "17 potansiyel bloklayici script var; hedef 12 veya alti.",
+        "Title uzun; mobil SERP icin 50-65 karakter araligina cekilmeli.",
+        "Sayfada tam bir adet H1 olmali.",
+        "Gorsellerde alt metin kapsami dusuk; haber gorselleri icin aciklayici alt metin uretin."
+      ]
+    },
+    {
+      "url": "https://www.diken.com.tr/",
+      "final_url": "https://www.diken.com.tr/",
+      "status": 200,
+      "bytes": 573711,
+      "elapsed_ms": 347,
+      "title_len": 56,
+      "description_len": 160,
+      "h1_count": 1,
+      "h2_count": 1,
+      "scripts": 70,
+      "blocking_scripts": 61,
+      "stylesheets": 10,
+      "images": 11,
+      "images_without_alt": 0,
+      "lazy_images": 0,
+      "json_ld_blocks": 1,
+      "json_ld_types": [],
+      "canonical": "https://www.diken.com.tr/",
+      "amphtml": "",
+      "cache_control": "public, max-age=0, s-maxage=2592000",
+      "cf_cache_status": "HIT",
+      "server": "cloudflare",
+      "external_domains": [
+        "securepubads.g.doubleclick.net",
+        "www.diken.com.tr",
+        "www.googletagmanager.com"
+      ],
+      "recommendations": [
+        "HTML boyutu 560 KB; hedef 220 KB altina indirilmeli.",
+        "61 potansiyel bloklayici script var; hedef 12 veya alti."
+      ]
+    },
+    {
+      "url": "https://www.birgun.net/",
+      "final_url": "https://www.birgun.net/",
+      "status": 200,
+      "bytes": 168029,
+      "elapsed_ms": 243,
+      "title_len": 64,
+      "description_len": 175,
+      "h1_count": 1,
+      "h2_count": 20,
+      "scripts": 44,
+      "blocking_scripts": 39,
+      "stylesheets": 8,
+      "images": 103,
+      "images_without_alt": 1,
+      "lazy_images": 47,
+      "json_ld_blocks": 3,
+      "json_ld_types": [
+        "ItemList",
+        "WebSite",
+        "NewsMediaOrganization"
+      ],
+      "canonical": "https://www.birgun.net/",
+      "amphtml": "",
+      "cache_control": "",
+      "cf_cache_status": "HIT",
+      "server": "cloudflare",
+      "external_domains": [
+        "ajax.googleapis.com",
+        "cdn.insurads.com",
+        "fonts.googleapis.com",
+        "i.ytimg.com",
+        "mc.yandex.ru",
+        "pagead2.googlesyndication.com",
+        "pubads.g.doubleclick.net",
+        "securepubads.g.doubleclick.net",
+        "static.birgun.net",
+        "static.cloudflareinsights.com",
+        "www.birgun.net"
+      ],
+      "recommendations": [
+        "39 potansiyel bloklayici script var; hedef 12 veya alti.",
+        "Meta description uzun; 140-165 karakter bandi hedeflenmeli."
+      ]
+    }
+  ]
+}

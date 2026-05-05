@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "purpose": "Medyafaresi ve Turkiye Gundemi icin ortak, kodla yonetilebilir haber-portali buyume agi.",
+  "nodes": [
+    {
+      "id": "property:medyafaresi",
+      "kind": "property",
+      "label": "Medyafaresi.com",
+      "role": "Mevcut marka, arama gecmisi ve medya/magazin/reyting uzmanligi"
+    },
+    {
+      "id": "property:turkiye-gundemi",
+      "kind": "property",
+      "label": "TurkiyeGundemi.com",
+      "role": "Yeni, hizli, moduler, gundem odakli haber markasi"
+    },
+    {
+      "id": "playbook:technical-seo",
+      "kind": "playbook",
+      "label": "Teknik SEO",
+      "rules": ["canonical", "news_sitemap", "article_schema", "internal_links", "robots"]
+    },
+    {
+      "id": "playbook:performance",
+      "kind": "playbook",
+      "label": "Performans",
+      "rules": ["html_budget", "script_budget", "image_preload", "cache_headers", "edge_cache"]
+    },
+    {
+      "id": "playbook:editorial-growth",
+      "kind": "playbook",
+      "label": "Editoriyal Buyume",
+      "rules": ["evergreen_hubs", "topic_clusters", "breaking_news_lane", "author_pages"]
+    },
+    {
+      "id": "playbook:distribution",
+      "kind": "playbook",
+      "label": "Dagitim",
+      "rules": ["google_news", "discover", "rss", "push", "social_packaging"]
+    },
+    {
+      "id": "infra:self-hosted",
+      "kind": "infrastructure",
+      "label": "Kendi Kendine Hosting",
+      "components": ["linux_server", "nginx_or_caddy", "python_runtime", "sqlite", "static_assets", "backup_jobs"]
+    }
+  ],
+  "edges": [
+    {"from": "property:medyafaresi", "to": "playbook:technical-seo", "relationship": "uses"},
+    {"from": "property:medyafaresi", "to": "playbook:performance", "relationship": "uses"},
+    {"from": "property:medyafaresi", "to": "playbook:editorial-growth", "relationship": "uses"},
+    {"from": "property:turkiye-gundemi", "to": "playbook:technical-seo", "relationship": "uses"},
+    {"from": "property:turkiye-gundemi", "to": "playbook:performance", "relationship": "uses"},
+    {"from": "property:turkiye-gundemi", "to": "playbook:distribution", "relationship": "uses"},
+    {"from": "property:turkiye-gundemi", "to": "infra:self-hosted", "relationship": "hosted_on"},
+    {"from": "property:medyafaresi", "to": "infra:self-hosted", "relationship": "migration_target"}
+  ],
+  "manual_control_points": [
+    "config/sites.json",
+    "content/turkiye-gundemi/articles.json",
+    "src/growth_os/audit.py",
+    "src/growth_os/sitegen.py",
+    "sites/turkiye-gundemi/public/assets/styles.css"
+  ]
+}

@@ -1,0 +1,20 @@
+[Unit]
+Description=Growth OS Turkiye Gundemi Model B
+After=network.target
+
+[Service]
+Type=simple
+User=growthos
+Group=growthos
+WorkingDirectory=/opt/growth-os
+EnvironmentFile=/etc/growth-os/growth-os.env
+ExecStart=/opt/growth-os/venv/bin/python -m src.growth_os.server --host 127.0.0.1 --port 8080 --site-at-root
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/opt/growth-os/config /opt/growth-os/content /opt/growth-os/sites /opt/growth-os/reports
+
+[Install]
+WantedBy=multi-user.target
