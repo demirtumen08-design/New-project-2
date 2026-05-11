@@ -1,0 +1,33 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build EXE
+        shell: pwsh
+        run: |
+          .\Build-Windows-EXE.ps1
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: TurkiyeGundemiApp-Windows-x64-v3
+          path: |
+            release\TurkiyeGundemiApp-Windows-x64-final.zip
+            release\TurkiyeGundemiApp-Windows-x64-folder.zip
+            release\TurkiyeGundemiApp-onefile.exe

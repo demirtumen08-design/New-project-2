@@ -46,7 +46,29 @@
       "enabled": true,
       "name": "NTV Son Dakika",
       "url": "https://www.ntv.com.tr/son-dakika.rss",
-      "category": "son-dakika"
+      "category": "son-dakika",
+      "priority": 78
+    },
+    {
+      "enabled": true,
+      "name": "NTV Gündem",
+      "url": "https://www.ntv.com.tr/gundem.rss",
+      "category": "gundem",
+      "priority": 82
+    },
+    {
+      "enabled": true,
+      "name": "NTV Türkiye",
+      "url": "https://www.ntv.com.tr/turkiye.rss",
+      "category": "gundem",
+      "priority": 80
+    },
+    {
+      "enabled": true,
+      "name": "NTV Ekonomi",
+      "url": "https://www.ntv.com.tr/ekonomi.rss",
+      "category": "ekonomi",
+      "priority": 84
     },
     {
       "enabled": true,
@@ -80,6 +102,20 @@
     },
     {
       "enabled": true,
+      "name": "Habertürk Gündem",
+      "url": "https://www.haberturk.com/rss/kategori/gundem.xml",
+      "category": "gundem",
+      "priority": 78
+    },
+    {
+      "enabled": true,
+      "name": "Habertürk Ekonomi",
+      "url": "https://www.haberturk.com/rss/kategori/ekonomi.xml",
+      "category": "ekonomi",
+      "priority": 82
+    },
+    {
+      "enabled": true,
       "name": "Ensonhaber Gündem",
       "url": "https://www.ensonhaber.com/rss/gundem.xml",
       "category": "gundem"
@@ -89,13 +125,171 @@
       "name": "Medyafaresi",
       "url": "https://www.medyafaresi.com/rss",
       "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "Diken",
+      "url": "https://www.diken.com.tr/feed/",
+      "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "BirGün",
+      "url": "https://www.birgun.net/rss/home",
+      "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "Independent Türkçe",
+      "url": "https://www.indyturk.com/rss.xml",
+      "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "Dünya Gazetesi",
+      "url": "https://www.dunya.com/rss",
+      "category": "ekonomi"
+    },
+    {
+      "enabled": true,
+      "name": "Ekonomim",
+      "url": "https://www.ekonomim.com/rss",
+      "category": "ekonomi",
+      "priority": 86
+    },
+    {
+      "enabled": true,
+      "name": "BloombergHT",
+      "url": "https://www.bloomberght.com/rss",
+      "category": "ekonomi",
+      "priority": 84
+    },
+    {
+      "enabled": true,
+      "name": "AA Güncel",
+      "url": "https://www.aa.com.tr/tr/rss/default?cat=guncel",
+      "category": "gundem",
+      "priority": 84
+    },
+    {
+      "enabled": true,
+      "name": "AA Ekonomi",
+      "url": "https://www.aa.com.tr/tr/rss/default?cat=ekonomi",
+      "category": "ekonomi",
+      "priority": 88
+    },
+    {
+      "enabled": true,
+      "name": "BBC Türkçe",
+      "url": "https://feeds.bbci.co.uk/turkce/rss.xml",
+      "category": "dunya"
+    },
+    {
+      "enabled": true,
+      "name": "DW Türkçe",
+      "url": "https://rss.dw.com/rdf/rss-tur-all",
+      "category": "dunya",
+      "priority": 66
+    },
+    {
+      "enabled": true,
+      "name": "Euronews Türkçe",
+      "url": "https://tr.euronews.com/rss",
+      "category": "dunya",
+      "priority": 66
+    },
+    {
+      "enabled": true,
+      "name": "Yeni Safak Son Dakika",
+      "url": "https://www.yenisafak.com/rss?xml=son-dakika",
+      "category": "son-dakika",
+      "priority": 66
+    },
+    {
+      "enabled": true,
+      "name": "Yeni Safak Gundem",
+      "url": "https://www.yenisafak.com/rss?xml=gundem",
+      "category": "gundem",
+      "priority": 64
+    },
+    {
+      "enabled": true,
+      "name": "Yeni Safak Ekonomi",
+      "url": "https://www.yenisafak.com/rss?xml=ekonomi",
+      "category": "ekonomi",
+      "priority": 58
+    },
+    {
+      "enabled": true,
+      "name": "Yeni Safak Dunya",
+      "url": "https://www.yenisafak.com/rss?xml=dunya",
+      "category": "dunya",
+      "priority": 56
+    },
+    {
+      "enabled": true,
+      "name": "Yeni Safak Spor",
+      "url": "https://www.yenisafak.com/rss?xml=spor",
+      "category": "spor",
+      "priority": 50
+    },
+    {
+      "enabled": true,
+      "name": "Yeni Safak Teknoloji",
+      "url": "https://www.yenisafak.com/rss?xml=teknoloji",
+      "category": "teknoloji",
+      "priority": 52
+    },
+    {
+      "enabled": true,
+      "name": "Karar",
+      "url": "https://www.karar.com/rss",
+      "category": "gundem",
+      "priority": 62
+    },
+    {
+      "enabled": true,
+      "name": "Gazete Duvar",
+      "url": "https://www.gazeteduvar.com.tr/rss",
+      "category": "gundem",
+      "priority": 62
+    },
+    {
+      "enabled": true,
+      "name": "Kisa Dalga",
+      "url": "https://kisadalga.net/rss",
+      "category": "gundem",
+      "priority": 58
+    },
+    {
+      "enabled": false,
+      "name": "T24",
+      "url": "https://t24.com.tr/rss",
+      "category": "gundem",
+      "note": "T24 erişimi 403 döndürdüğü için şimdilik kapalı; doğrulanmış RSS endpoint bulununca tekrar açılacak."
     }
   ],
   "defaults": {
-    "limit": 30,
-    "max_import_per_cycle": 3,
+    "limit": 120,
+    "max_import_per_cycle": 24,
     "status": "published",
     "publish_site_after_import": true,
-    "require_live_sources": true
+    "require_live_sources": true,
+    "scan_interval_seconds": 180,
+    "source_workers": 12,
+    "article_detail_workers": 16,
+    "min_publish_score": 68,
+    "source_error_cooldown_seconds": 1800,
+    "max_source_backoff_seconds": 21600,
+    "image_enrichment": true,
+    "network_auto_repair": {
+      "enabled": true,
+      "prefer_public_ip": true,
+      "update_dns_records": true,
+      "regenerate_dns_on_ip_change": true,
+      "regenerate_site_on_ip_change": true,
+      "network_check_interval_seconds": 300,
+      "secondary_ip": ""
+    }
   }
 }

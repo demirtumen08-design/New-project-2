@@ -12,10 +12,25 @@ from urllib.parse import parse_qs, unquote, urlparse
 
 from .audit import audit_site
 from .config import ROOT, get_site, load_config, project_path, save_config
-from .content_store import delete_article, load_articles, upsert_article
+from .content_quality import apply_quality_gate, audit_articles
+from .content_store import delete_article, load_articles, slugify, upsert_article
 from .dnsgen import generate as generate_dns
-from .news_automation import fetch_latest_news, import_news
+from .image_enrichment import apply_related_visuals, enrich_existing_articles
+from .news_automation import fetch_latest_news, import_news, repair_draft_articles_from_sources
+from .runtime_network import heal_network_runtime, runtime_status
+from .autonomous_daemon import run_cycle as run_autonomous_cycle
 from .sitegen import generate as generate_site
+from .subscriptions import (
+    COOKIE_NAME,
+    create_subscription_code,
+    dossier_article,
+    list_subscriptions,
+    resolve_attachment_path,
+    sign_subscription_session,
+    update_subscription_settings,
+    verify_code,
+    verify_subscription_cookie,
+)
 
 
 class GrowthHandler(BaseHTTPRequestHandler):
@@ -25,6 +40,10 @@ class GrowthHandler(BaseHTTPRequestHandler):
         return bool(getattr(self.server, "site_at_root", False))
 
     def protected_path(self, path: str) -> bool:
+        if path in {"/api/subscription-check", "/api/subscription-status"}:
+            return False
+        if path.startswith("/premium/"):
+            return False
         if path.startswith("/api/") or path == "/admin":
             return True
         return path == "/" and not self.site_at_root()
@@ -73,6 +92,17 @@ class GrowthHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.write_body(data)
 
+    def send_json(self, payload: dict, status: int = 200, headers: dict[str, str] | None = None) -> None:
+        data = json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-store")
+        for key, value in (headers or {}).items():
+            self.send_header(key, value)
+        self.end_headers()
+        self.write_body(data)
+
     def send_file(self, path: Path) -> None:
         resolved = path.resolve()
         if not resolved.exists() or not resolved.is_file():
@@ -118,6 +148,10 @@ class GrowthHandler(BaseHTTPRequestHandler):
             site = parse_qs(parsed.query).get("site", ["turkiye-gundemi"])[0]
             self.send_text(json.dumps(load_articles(site), ensure_ascii=False, indent=2), content_type="application/json; charset=utf-8")
             return
+        if path == "/api/content-quality":
+            site = parse_qs(parsed.query).get("site", ["turkiye-gundemi"])[0]
+            self.send_json({"ok": True, **audit_articles(load_articles(site))})
+            return
         if path == "/api/site-config":
             site_id = parse_qs(parsed.query).get("site", ["turkiye-gundemi"])[0]
             self.send_text(json.dumps(get_site(site_id), ensure_ascii=False, indent=2), content_type="application/json; charset=utf-8")
@@ -132,7 +166,7 @@ class GrowthHandler(BaseHTTPRequestHandler):
             self.send_text(json.dumps(payload, ensure_ascii=False, indent=2), content_type="application/json; charset=utf-8")
             return
         if path == "/api/news-scan":
-            limit = int(parse_qs(parsed.query).get("limit", ["18"])[0] or "18")
+            limit = int(parse_qs(parsed.query).get("limit", ["90"])[0] or "90")
             try:
                 payload = fetch_latest_news(limit=limit)
             except Exception as exc:  # noqa: BLE001 - admin should see source error
@@ -140,12 +174,35 @@ class GrowthHandler(BaseHTTPRequestHandler):
                 return
             self.send_text(json.dumps(payload, ensure_ascii=False, indent=2), content_type="application/json; charset=utf-8")
             return
+        if path == "/api/runtime-network":
+            try:
+                payload = runtime_status()
+            except Exception as exc:  # noqa: BLE001 - admin should see network error
+                self.send_text(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False), 500, "application/json; charset=utf-8")
+                return
+            self.send_text(json.dumps(payload, ensure_ascii=False, indent=2), content_type="application/json; charset=utf-8")
+            return
+        if path == "/api/subscription-status":
+            site_id = parse_qs(parsed.query).get("site", ["turkiye-gundemi"])[0]
+            active = verify_subscription_cookie(site_id, self.headers.get("Cookie"), "dosya")
+            self.send_json({"ok": True, "active": active})
+            return
+        if path == "/api/subscriptions":
+            site_id = parse_qs(parsed.query).get("site", ["turkiye-gundemi"])[0]
+            self.send_json({"ok": True, **list_subscriptions(site_id)})
+            return
+        if path.startswith("/premium/dosya/"):
+            slug = path.removeprefix("/premium/dosya/").strip("/")
+            self.send_premium_dossier("turkiye-gundemi", slug)
+            return
         if path.startswith("/turkiye-gundemi"):
             relative = path.removeprefix("/turkiye-gundemi").strip("/")
             self.send_public_file(relative)
             return
-        if path == "/robots.txt" or path == "/sitemap.xml" or path == "/news-sitemap.xml" or path == "/llms.txt" or path.startswith(("/assets/", "/haber/", "/kategori/")):
-            relative = path.strip("/")
+        relative = path.strip("/")
+        public_dir = project_path(get_site("turkiye-gundemi")["public_dir"]).resolve()
+        target = (public_dir / relative).resolve()
+        if target.exists() or (target / "index.html").exists():
             self.send_public_file(relative)
             return
         self.send_text("Not found", 404, "text/plain; charset=utf-8")
@@ -163,6 +220,30 @@ class GrowthHandler(BaseHTTPRequestHandler):
             return
         self.send_file(target)
 
+    def send_premium_dossier(self, site_id: str, slug: str) -> None:
+        if not verify_subscription_cookie(site_id, self.headers.get("Cookie"), "dosya"):
+            body = f"""<!doctype html>
+<html lang="tr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Abonelik gerekli</title></head>
+<body style="font-family:Arial,Helvetica,sans-serif;max-width:720px;margin:48px auto;padding:0 18px;line-height:1.5">
+  <h1>Dosya aboneliği gerekli</h1>
+  <p>Bu PDF dosyasını açmak için geçerli bir dosya abonelik kodu girmeniz gerekiyor.</p>
+  <p><a href="/dosya/{slug}/">Dosya sayfasına dön</a></p>
+</body>
+</html>"""
+            self.send_text(body, 403)
+            return
+        article = dossier_article(site_id, slug)
+        if not article:
+            self.send_text("Dosya bulunamadı", 404, "text/plain; charset=utf-8")
+            return
+        attachment = str(article.get("attachment_url") or "").strip()
+        target = resolve_attachment_path(site_id, attachment)
+        if not target or not target.exists() or not target.is_file():
+            self.send_text("Korumalı dosya bulunamadı", 404, "text/plain; charset=utf-8")
+            return
+        self.send_file(target)
+
     def do_POST(self) -> None:  # noqa: N802 - stdlib handler API
         parsed = urlparse(self.path)
         path = unquote(parsed.path)
@@ -170,6 +251,21 @@ class GrowthHandler(BaseHTTPRequestHandler):
             return
         try:
             payload = self.read_json()
+            if path == "/api/subscription-check":
+                site = payload.get("site", "turkiye-gundemi")
+                result = verify_code(site, str(payload.get("code") or ""), str(payload.get("tier") or "dosya"))
+                if not result.get("ok"):
+                    self.send_json(result, 403)
+                    return
+                token = sign_subscription_session(site, result["code_hash"], result.get("expires_at"), result.get("tier", "dosya"))
+                forwarded_proto = self.headers.get("X-Forwarded-Proto", "")
+                secure = "; Secure" if forwarded_proto == "https" or self.headers.get("Host", "").startswith("turkiyegundemi.com") else ""
+                cookie = f"{COOKIE_NAME}={token}; Path=/; HttpOnly; SameSite=Lax{secure}"
+                self.send_json(
+                    {"ok": True, "active": True, "expires_at": result.get("expires_at")},
+                    headers={"Set-Cookie": cookie},
+                )
+                return
             if path == "/api/articles":
                 site = payload.pop("site", "turkiye-gundemi")
                 article = upsert_article(site, payload)
@@ -185,6 +281,14 @@ class GrowthHandler(BaseHTTPRequestHandler):
                 out = generate_site(site)
                 self.send_text(json.dumps({"ok": True, "public_dir": str(out)}, ensure_ascii=False), content_type="application/json; charset=utf-8")
                 return
+            if path == "/api/content-quality-apply":
+                site = payload.get("site", "turkiye-gundemi")
+                out = apply_quality_gate(site, dry_run=bool(payload.get("dry_run", False)))
+                if bool(payload.get("publish_site", True)) and not out["dry_run"]:
+                    public_dir = generate_site(site)
+                    out["public_dir"] = str(public_dir)
+                self.send_json(out)
+                return
             if path == "/api/dns-generate":
                 site = payload.get("site", "turkiye-gundemi")
                 primary_ip = str(payload.get("primary_ip", "")).strip()
@@ -196,13 +300,79 @@ class GrowthHandler(BaseHTTPRequestHandler):
                 update_site_config(payload)
                 self.send_text(json.dumps({"ok": True}, ensure_ascii=False), content_type="application/json; charset=utf-8")
                 return
+            if path == "/api/subscription-create":
+                out = create_subscription_code(
+                    payload.get("site", "turkiye-gundemi"),
+                    label=str(payload.get("label") or ""),
+                    days=int(payload.get("days") or 30),
+                    tier=str(payload.get("tier") or "dosya"),
+                    code=str(payload.get("code") or "").strip() or None,
+                )
+                self.send_json({"ok": True, **out})
+                return
+            if path == "/api/subscription-settings":
+                settings = update_subscription_settings(payload.get("site", "turkiye-gundemi"), payload)
+                self.send_json({"ok": True, "settings": settings})
+                return
             if path == "/api/news-import":
                 out = import_news(
                     site_id=payload.get("site", "turkiye-gundemi"),
-                    limit=int(payload.get("limit", 18)),
-                    max_items=int(payload.get("max_items", 3)),
+                    limit=int(payload.get("limit", 90)),
+                    max_items=int(payload.get("max_items", 6)),
                     status=str(payload.get("status", "draft")),
                     publish_site=bool(payload.get("publish_site", False)),
+                    enrich_images=bool(payload.get("enrich_images", False)),
+                )
+                self.send_text(json.dumps(out, ensure_ascii=False, indent=2), content_type="application/json; charset=utf-8")
+                return
+            if path == "/api/news-repair-drafts":
+                out = repair_draft_articles_from_sources(
+                    site_id=payload.get("site", "turkiye-gundemi"),
+                    limit=int(payload.get("limit", 60)),
+                    publish_site=bool(payload.get("publish_site", True)),
+                )
+                self.send_text(json.dumps(out, ensure_ascii=False, indent=2), content_type="application/json; charset=utf-8")
+                return
+            if path == "/api/enrich-images":
+                out = enrich_existing_articles(
+                    site_id=payload.get("site", "turkiye-gundemi"),
+                    force=bool(payload.get("force", False)),
+                    only_missing=not bool(payload.get("force", False)),
+                    publish_site=bool(payload.get("publish_site", False)),
+                    limit=int(payload.get("limit", 0) or 0) or None,
+                )
+                self.send_text(json.dumps(out, ensure_ascii=False, indent=2), content_type="application/json; charset=utf-8")
+                return
+            if path == "/api/related-images":
+                out = apply_related_visuals(
+                    site_id=payload.get("site", "turkiye-gundemi"),
+                    force=bool(payload.get("force", False)),
+                    only_missing=not bool(payload.get("force", False)),
+                    publish_site=bool(payload.get("publish_site", False)),
+                    limit=int(payload.get("limit", 20)) if payload.get("limit") else None,
+                )
+                self.send_text(json.dumps(out, ensure_ascii=False, indent=2), content_type="application/json; charset=utf-8")
+                return
+            if path == "/api/network-heal":
+                out = heal_network_runtime(
+                    site_id=payload.get("site", "turkiye-gundemi"),
+                    apply_config=bool(payload.get("apply_config", True)),
+                    publish_site=bool(payload.get("publish_site", False)),
+                    generate_dns_files=bool(payload.get("generate_dns", True)),
+                    prefer_public_ip=None if payload.get("prefer_public_ip") is None else bool(payload.get("prefer_public_ip")),
+                )
+                self.send_text(json.dumps(out, ensure_ascii=False, indent=2), content_type="application/json; charset=utf-8")
+                return
+            if path == "/api/autonomous-cycle":
+                out = run_autonomous_cycle(
+                    site_id=payload.get("site", "turkiye-gundemi"),
+                    limit=int(payload.get("limit", 90)),
+                    max_items=int(payload.get("max_items", 6)),
+                    status=str(payload.get("status", "published")),
+                    publish_site=bool(payload.get("publish_site", True)),
+                    enrich_images=bool(payload.get("enrich_images", True)),
+                    heal_network=bool(payload.get("heal_network", True)),
+                    prefer_public_ip=None if payload.get("prefer_public_ip") is None else bool(payload.get("prefer_public_ip")),
                 )
                 self.send_text(json.dumps(out, ensure_ascii=False, indent=2), content_type="application/json; charset=utf-8")
                 return
@@ -226,6 +396,7 @@ def update_site_config(payload: dict) -> None:
         site.setdefault("theme", {}).update({key: str(value).strip() for key, value in payload["theme"].items()})
     if "categories" in payload:
         categories = []
+        seen_slugs: set[str] = set()
         raw = payload["categories"]
         if isinstance(raw, str):
             lines = [line.strip() for line in raw.splitlines() if line.strip()]
@@ -233,11 +404,23 @@ def update_site_config(payload: dict) -> None:
                 if "|" in line:
                     slug, name = [part.strip() for part in line.split("|", 1)]
                 else:
-                    slug = line.lower().replace(" ", "-")
                     name = line
-                categories.append({"slug": slug, "name": name})
+                    slug = line
+                normalized_slug = slugify(slug or name)
+                if not name or normalized_slug in seen_slugs:
+                    continue
+                seen_slugs.add(normalized_slug)
+                categories.append({"slug": normalized_slug, "name": name})
         elif isinstance(raw, list):
-            categories = raw
+            for item in raw:
+                if not isinstance(item, dict):
+                    continue
+                name = str(item.get("name") or item.get("slug") or "").strip()
+                normalized_slug = slugify(str(item.get("slug") or name).strip())
+                if not name or normalized_slug in seen_slugs:
+                    continue
+                seen_slugs.add(normalized_slug)
+                categories.append({"slug": normalized_slug, "name": name})
         if categories:
             site["categories"] = categories
     save_config(config)
@@ -269,38 +452,38 @@ def render_dashboard() -> str:
 <body>
   <header>
     <h1>Medyafaresi Growth OS</h1>
-    <p>Teknik audit, site uretimi ve self-hosted yayin altyapisi icin yerel kontrol paneli.</p>
+    <p>Teknik audit, site üretimi ve self-hosted yayın altyapısı için yerel kontrol paneli.</p>
   </header>
   <main>
     <section>
-      <h2>Yonetim Paneli</h2>
-      <p>Turkiye Gundemi haberlerini, site ayarlarini ve yayinlamayi buradan yonetin.</p>
-      <a href="/admin">Admin panelini ac</a>
+      <h2>Yönetim Paneli</h2>
+      <p>Türkiye Gündemi haberlerini, site ayarlarını ve yayınlamayı buradan yönetin.</p>
+      <a href="/admin">Admin panelini aç</a>
     </section>
     <section>
       <h2>Medyafaresi Audit</h2>
-      <p>Canli sayfa, sitemap, cache, schema ve rakip sinyallerini olcer.</p>
-      <button onclick="runAudit('medyafaresi')">Audit calistir</button>
+      <p>Canlı sayfa, sitemap, cache, schema ve rakip sinyallerini ölçer.</p>
+      <button onclick="runAudit('medyafaresi')">Audit çalıştır</button>
     </section>
     <section>
-      <h2>Turkiye Gundemi</h2>
-      <p>Duzenlenebilir icerikten uretilmis statik siteyi ac.</p>
-      <a href="/turkiye-gundemi/">Siteyi ac</a>
+      <h2>Türkiye Gündemi</h2>
+      <p>Düzenlenebilir içerikten üretilmiş statik siteyi aç.</p>
+      <a href="/turkiye-gundemi/">Siteyi aç</a>
     </section>
     <section>
-      <h2>Dokuman</h2>
+      <h2>Doküman</h2>
       <p>Yerel audit ve yol haritasi dosyasi: {docs}</p>
     </section>
     <section>
       <h2>API</h2>
-      <p><code>/api/audit?site=medyafaresi</code> ve <code>/api/sites</code> endpointleri hazir.</p>
+      <p><code>/api/audit?site=medyafaresi</code> ve <code>/api/sites</code> endpointleri hazır.</p>
     </section>
-    <pre id="out">Hazir.</pre>
+    <pre id="out">Hazır.</pre>
   </main>
   <script>
     async function runAudit(site) {{
       const out = document.getElementById('out');
-      out.textContent = 'Audit calisiyor...';
+      out.textContent = 'Audit çalışıyor...';
       const res = await fetch('/api/audit?site=' + encodeURIComponent(site));
       out.textContent = JSON.stringify(await res.json(), null, 2);
     }}
@@ -315,7 +498,7 @@ def render_admin() -> str:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Turkiye Gundemi Admin</title>
+  <title>Türkiye Gündemi Admin</title>
   <style>
     * { box-sizing: border-box; }
     body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: #171717; background: #f5f6f8; }
@@ -335,6 +518,10 @@ def render_admin() -> str:
     .article-list button { width: 100%; text-align: left; justify-content: flex-start; background: #fff; color: #171717; border-color: #d0d5dd; }
     .badge { display: inline-flex; align-items: center; border: 1px solid #d0d5dd; border-radius: 999px; padding: 2px 8px; font-size: 12px; color: #344054; background: #fff; }
     .badge.draft { color: #92400e; border-color: #f5c542; background: #fffbeb; }
+    .stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+    .stat-card { border: 1px solid #d0d5dd; border-radius: 8px; background: #f8fafc; padding: 10px; min-height: 74px; }
+    .stat-card strong { display: block; font-size: 26px; line-height: 1; color: #0f172a; }
+    .stat-card span { display: block; margin-top: 6px; color: #667085; font-size: 12px; font-weight: 700; }
     .muted { color: #667085; font-size: 13px; }
     .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
     .tabs button { background: #fff; color: #0f4c81; }
@@ -350,53 +537,77 @@ def render_admin() -> str:
 <body>
   <header>
     <div>
-      <h1>Turkiye Gundemi Admin</h1>
-      <div class="muted">Haberleri ve site ayarlarini duzenleyip statik siteye yayinlayin.</div>
+      <h1>Türkiye Gündemi Admin</h1>
+      <div class="muted">Haberleri ve site ayarlarını düzenleyip statik siteye yayınlayın.</div>
     </div>
     <div class="row">
-      <a class="link-button" href="/turkiye-gundemi/" target="_blank">Siteyi ac</a>
-      <button onclick="publishSite()">Yayinla</button>
+      <a class="link-button" href="/turkiye-gundemi/" target="_blank">Siteyi aç</a>
+      <button onclick="publishSite()">Yayınla</button>
     </div>
   </header>
   <main>
     <aside>
       <div class="row">
         <button onclick="newArticle()">Yeni Haber</button>
+        <button class="secondary" onclick="newDossier()">Yeni Dosya</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="secondary" onclick="showAllArticles()">Tümü</button>
+        <button class="secondary" onclick="showDossiers()">Dosyalar</button>
+        <button class="secondary" onclick="runQualityAudit()">Kalite</button>
         <button class="secondary" onclick="loadAll()">Yenile</button>
+      </div>
+      <div id="contentStats" class="stat-grid" aria-label="İçerik sayıları">
+        <div class="stat-card"><strong id="publishedNewsCount">0</strong><span>Yayındaki Haber</span></div>
+        <div class="stat-card"><strong id="totalContentCount">0</strong><span>Toplam İçerik</span></div>
+        <div class="stat-card"><strong id="draftContentCount">0</strong><span>Taslak</span></div>
+        <div class="stat-card"><strong id="dossierContentCount">0</strong><span>Dosya</span></div>
+        <div class="stat-card"><strong id="qualityIssueCount">0</strong><span>Kalite Uyarısı</span></div>
       </div>
       <ul id="articleList" class="article-list"></ul>
     </aside>
     <section>
       <div class="tabs">
-        <button id="tabArticle" class="active" onclick="showTab('article')">Haber</button>
+        <button id="tabArticle" class="active" onclick="showTab('article')">Haber/Dosya</button>
         <button id="tabNews" onclick="showTab('news')">Haber Robotu</button>
-        <button id="tabSettings" onclick="showTab('settings')">Site Ayarlari</button>
+        <button id="tabSubs" onclick="showTab('subs')">Abonelik</button>
+        <button id="tabSettings" onclick="showTab('settings')">Site Ayarları</button>
         <button id="tabDns" onclick="showTab('dns')">DNS</button>
-        <button id="tabOutput" onclick="showTab('output')">Cikti</button>
+        <button id="tabOutput" onclick="showTab('output')">Çıktı</button>
       </div>
       <form id="articleForm" onsubmit="saveArticle(event)">
         <div class="row">
-          <div><label>Baslik</label><input id="title" required></div>
+          <div><label>Başlık</label><input id="title" required></div>
           <div><label>Slug</label><input id="slug"></div>
         </div>
         <div class="row">
           <div><label>Kategori</label><select id="category"></select></div>
           <div><label>Yazar</label><input id="author"></div>
         </div>
-        <label>Ozet</label><textarea id="summary"></textarea>
+        <label>Özet</label><textarea id="summary"></textarea>
         <label>Haber metni</label><textarea id="body" style="min-height:220px"></textarea>
         <div class="row">
-          <div><label>Gorsel yolu</label><input id="image" placeholder="/assets/images/ankara.png"></div>
-          <div><label>Gorsel alt metni</label><input id="image_alt"></div>
+          <div><label>Görsel yolu</label><input id="image" placeholder="/assets/images/ankara.png"></div>
+          <div><label>Görsel alt metni</label><input id="image_alt"></div>
         </div>
         <div class="row">
-          <div><label>Yayin tarihi</label><input id="published_at"></div>
-          <div><label>Durum</label><select id="status"><option value="published">Yayinda</option><option value="draft">Taslak</option></select></div>
+          <div><label>Yayın tarihi</label><input id="published_at"></div>
+          <div><label>Durum</label><select id="status"><option value="published">Yayında</option><option value="draft">Taslak</option></select></div>
           <div><label>Etiketler</label><input id="tags" placeholder="gundem, ekonomi"></div>
         </div>
         <div class="row">
-          <div><label>Kaynak adi</label><input id="source_name"></div>
+          <div><label>Kaynak adı</label><input id="source_name"></div>
           <div><label>Kaynak URL</label><input id="source_url"></div>
+        </div>
+        <div class="row">
+          <div><label>Dergi/PDF bağlantısı</label><input id="attachment_url" placeholder="https://... veya /assets/dergi/sayi-1.pdf"></div>
+          <div><label>Sayı / Dosya No</label><input id="issue_number" placeholder="1"></div>
+          <div><label>Kapak etiketi</label><input id="cover_label" placeholder="Türkiye Gündemi Dosya"></div>
+        </div>
+        <div class="row">
+          <div><label>Dosya erişimi</label><select id="premium_required"><option value="true">Abonelik gerekli</option><option value="false">Ücretsiz</option></select></div>
+          <div><label>Abonelik ücreti etiketi</label><input id="subscription_price" placeholder="Aylık 99 TL"></div>
+          <div><label>Abonelik türü</label><input id="subscription_tier" placeholder="dosya"></div>
         </div>
         <div class="row" style="margin-top:14px">
           <button type="submit">Kaydet</button>
@@ -404,22 +615,59 @@ def render_admin() -> str:
         </div>
       </form>
       <form id="newsForm" class="hidden" onsubmit="importNews(event)">
-        <p class="muted">RSS kaynaklarini tarar, kopya haberleri ayiklar ve Turkiye Gundemi icin kaynak linkli haber kaydi uretir.</p>
+        <p class="muted">RSS kaynaklarını tarar, kopya haberleri ayıklar, haber metni oluşturur. Kaynak görseli ekleme telif kontrolü gerektirdiği için isteğe bağlıdır.</p>
         <div class="row">
-          <div><label>Tarama limiti</label><input id="newsLimit" type="number" min="1" max="50" value="18"></div>
-          <div><label>Icerige alinacak yeni haber</label><input id="newsMax" type="number" min="1" max="20" value="3"></div>
-          <div><label>Aktarma durumu</label><select id="newsStatus"><option value="published" selected>Yayinda</option><option value="draft">Taslak</option></select></div>
+          <div><label>Tarama limiti</label><input id="newsLimit" type="number" min="1" max="120" value="90"></div>
+          <div><label>İçeriğe alınacak yeni haber</label><input id="newsMax" type="number" min="1" max="60" value="6"></div>
+          <div><label>Aktarma durumu</label><select id="newsStatus"><option value="published" selected>Yayında</option><option value="draft">Taslak</option></select></div>
         </div>
-        <label><input id="newsPublishSite" type="checkbox" checked style="width:auto; margin-right:8px">Icerige aldiktan sonra statik siteyi yayinla</label>
+        <label><input id="newsPublishSite" type="checkbox" checked style="width:auto; margin-right:8px">İçeriğe aldıktan sonra statik siteyi yayınla</label>
+        <label><input id="newsEnrichImages" type="checkbox" style="width:auto; margin-right:8px">Kaynak görseli tara ve yerel olarak ekle</label>
         <div class="row" style="margin-top:14px">
-          <button type="button" class="secondary" onclick="scanNews()">Kaynaklari Tara</button>
-          <button type="submit">Haberleri Icerige Al</button>
+          <button type="button" class="secondary" onclick="scanNews()">Kaynakları Tara</button>
+          <button type="button" class="secondary" onclick="healNetwork()">IP/Ağ Ön Hazırlığı</button>
+          <button type="button" class="secondary" onclick="runAutonomousCycle()">Otonom Döngü Testi</button>
+          <button type="button" class="secondary" onclick="generateRelatedImages()">İlişkili Görsel Üret</button>
+          <button type="button" class="secondary" onclick="enrichImages()">Arşiv Görsellerini Tara</button>
+          <button type="button" class="secondary" onclick="runQualityAudit()">Kalite Denetimi</button>
+          <button type="button" class="secondary" onclick="applyQualityGate()">Sorunluları Taslağa Al</button>
+          <button type="button" class="secondary" onclick="repairDraftNews()">Taslakları Kaynaktan Onar</button>
+          <button type="submit">Haberleri İçeriğe Al</button>
         </div>
         <div id="newsResults" class="news-results"></div>
       </form>
+      <form id="subsForm" class="hidden" onsubmit="createSubscription(event)">
+        <p class="muted">Dosya/dergi yayınları için manuel abonelik kodu üretir. Ödeme tahsilatı dışarıda alındıktan sonra kodu okura verin; okur kodla PDF erişimini açar.</p>
+        <div class="row">
+          <div><label>Abone / not</label><input id="subscriberLabel" placeholder="Ad soyad veya not"></div>
+          <div><label>Gün</label><input id="subscriberDays" type="number" min="1" max="3650" value="30"></div>
+          <div><label>Tür</label><input id="subscriberTier" value="dosya"></div>
+        </div>
+        <div class="row">
+          <div><label>Fiyat etiketi</label><input id="subscriptionPriceLabel" placeholder="Aylık 99 TL"></div>
+          <div><label>Oturum günü</label><input id="subscriptionCookieDays" type="number" min="1" max="3650" value="30"></div>
+        </div>
+        <div class="row" style="margin-top:14px">
+          <button type="submit">Kod Üret</button>
+          <button type="button" class="secondary" onclick="saveSubscriptionSettings()">Abonelik Ayarlarını Kaydet</button>
+          <button type="button" class="secondary" onclick="loadSubscriptions()">Listeyi Yenile</button>
+        </div>
+        <p class="muted">Ödeme sağlayıcısı: Iyzico Link, PayTR Link veya Shopier ürün/ödeme linklerini ilgili paketlere girin. Linkler kaydedilince abonelik sayfasındaki paketler doğrudan ödeme sayfasına yönlenir.</p>
+        <label><input id="paymentEnabled" type="checkbox" style="width:auto; margin-right:8px">Ödeme linklerini sitede göster</label>
+        <div class="row">
+          <div><label>Sağlayıcı adı</label><input id="paymentProviderLabel" placeholder="Iyzico / PayTR / Shopier"></div>
+          <div><label>Aylık ödeme linki</label><input id="paymentAylikUrl" placeholder="https://"></div>
+        </div>
+        <div class="row">
+          <div><label>3 aylık ödeme linki</label><input id="paymentUcAylikUrl" placeholder="https://"></div>
+          <div><label>Yıllık ödeme linki</label><input id="paymentYillikUrl" placeholder="https://"></div>
+        </div>
+        <pre id="subscriptionOutput">Henüz kod üretilmedi.</pre>
+        <div id="subscriberList" class="news-results"></div>
+      </form>
       <form id="settingsForm" class="hidden" onsubmit="saveSettings(event)">
         <div class="row">
-          <div><label>Site adi</label><input id="siteName"></div>
+          <div><label>Site adı</label><input id="siteName"></div>
           <div><label>Domain</label><input id="domain"></div>
         </div>
         <label>Base URL</label><input id="baseUrl">
@@ -428,60 +676,102 @@ def render_admin() -> str:
           <div><label>Accent renk</label><input id="accent"></div>
         </div>
         <label>Kategoriler</label>
-        <textarea id="categories" placeholder="slug | Gorunen ad"></textarea>
-        <p class="muted">Her satir: <code>slug | Gorunen ad</code>. Ornek: <code>gundem | Gundem</code></p>
-        <button type="submit">Ayarlari Kaydet</button>
+        <textarea id="categories" placeholder="slug | Görünen ad"></textarea>
+        <p class="muted">Her satır: <code>slug | Görünen ad</code>. Örnek: <code>gundem | Gündem</code>, <code>dosya | Dosya</code></p>
+        <button type="submit">Ayarları Kaydet</button>
       </form>
       <form id="dnsForm" class="hidden" onsubmit="generateDns(event)">
         <label>Primary DNS / Model B IPv4</label>
         <input id="primaryIp" placeholder="1.2.3.4">
         <label>Secondary DNS IPv4</label>
         <input id="secondaryIp" placeholder="5.6.7.8">
-        <p class="muted">Uretim icin ns2 farkli bir sunucu/IP olmali. Tek IP ile test yapilabilir ama onerilmez.</p>
-        <button type="submit">DNS Zone Uret</button>
+        <p class="muted">Üretim için ns2 farklı bir sunucu/IP olmalı. Tek IP ile test yapılabilir ama önerilmez.</p>
+        <button type="submit">DNS Zone Üret</button>
       </form>
-      <pre id="output" class="hidden">Hazir.</pre>
+      <pre id="output" class="hidden">Hazır.</pre>
     </section>
   </main>
   <script>
     let articles = [];
     let settings = null;
     let scannedNews = null;
+    let qualityAudit = null;
     let currentSlug = '';
+    let listFilter = 'all';
     const $ = id => document.getElementById(id);
     function log(value) { $('output').textContent = typeof value === 'string' ? value : JSON.stringify(value, null, 2); }
     function showTab(name) {
       $('articleForm').classList.toggle('hidden', name !== 'article');
       $('newsForm').classList.toggle('hidden', name !== 'news');
+      $('subsForm').classList.toggle('hidden', name !== 'subs');
       $('settingsForm').classList.toggle('hidden', name !== 'settings');
       $('dnsForm').classList.toggle('hidden', name !== 'dns');
       $('output').classList.toggle('hidden', name !== 'output');
       $('tabArticle').classList.toggle('active', name === 'article');
       $('tabNews').classList.toggle('active', name === 'news');
+      $('tabSubs').classList.toggle('active', name === 'subs');
       $('tabSettings').classList.toggle('active', name === 'settings');
       $('tabDns').classList.toggle('active', name === 'dns');
       $('tabOutput').classList.toggle('active', name === 'output');
     }
     async function api(url, options) {
       const res = await fetch(url, options);
-      const data = await res.json();
-      if (!res.ok || data.ok === false) throw new Error(data.error || 'Islem basarisiz');
+      const contentType = res.headers.get('content-type') || '';
+      const isJson = contentType.includes('application/json');
+      const data = isJson ? await res.json() : await res.text();
+      if (!res.ok) {
+        const message = isJson && data && data.error
+          ? data.error
+          : (typeof data === 'string' && data.trim() ? data.trim() : 'İşlem başarısız');
+        throw new Error(message);
+      }
+      if (isJson && data && data.ok === false) throw new Error(data.error || 'İşlem başarısız');
       return data;
     }
     async function loadAll() {
-      articles = await (await fetch('/api/articles?site=turkiye-gundemi')).json();
-      settings = await (await fetch('/api/site-config?site=turkiye-gundemi')).json();
+      articles = await api('/api/articles?site=turkiye-gundemi');
+      settings = await api('/api/site-config?site=turkiye-gundemi');
+      qualityAudit = await api('/api/content-quality?site=turkiye-gundemi').catch(() => null);
+      ensureDossierCategory();
+      renderStats();
       renderList();
       renderCategories();
       fillSettings();
+      await loadSubscriptions().catch(() => {});
       if (articles[0]) fillArticle(articles[0]);
     }
+    function ensureDossierCategory() {
+      settings.categories = settings.categories || [];
+      if (!settings.categories.some(c => c.slug === 'dosya')) {
+        settings.categories.push({slug: 'dosya', name: 'Dosya'});
+      }
+    }
+    function renderStats() {
+      const publishedNews = articles.filter(a => (a.status || 'published') === 'published' && a.category !== 'dosya').length;
+      const drafts = articles.filter(a => (a.status || 'published') === 'draft').length;
+      const dossiers = articles.filter(a => a.category === 'dosya').length;
+      $('publishedNewsCount').textContent = publishedNews.toLocaleString('tr-TR');
+      $('totalContentCount').textContent = articles.length.toLocaleString('tr-TR');
+      $('draftContentCount').textContent = drafts.toLocaleString('tr-TR');
+      $('dossierContentCount').textContent = dossiers.toLocaleString('tr-TR');
+      $('qualityIssueCount').textContent = ((qualityAudit && qualityAudit.blocked_published) || 0).toLocaleString('tr-TR');
+    }
     function renderList() {
-      $('articleList').innerHTML = articles.map(a => {
+      const visibleArticles = listFilter === 'dosya' ? articles.filter(a => a.category === 'dosya') : articles;
+      $('articleList').innerHTML = visibleArticles.map(a => {
         const status = a.status || 'published';
-        const label = status === 'draft' ? 'Taslak' : 'Yayinda';
+        const label = status === 'draft' ? 'Taslak' : 'Yayında';
         return `<li><button onclick="selectArticle('${a.slug.replaceAll("'", "\\'")}')"><strong>${escapeHtml(a.title)}</strong><br><span class="muted">${escapeHtml(a.category)} - ${escapeHtml(a.published_at || '')}</span><br><span class="badge ${status === 'draft' ? 'draft' : ''}">${label}</span></button></li>`;
-      }).join('');
+      }).join('') || '<li class="muted">Bu listede içerik yok.</li>';
+    }
+    function showAllArticles() {
+      listFilter = 'all';
+      renderList();
+    }
+    function showDossiers() {
+      listFilter = 'dosya';
+      renderList();
+      showTab('article');
     }
     function renderCategories() {
       $('category').innerHTML = (settings.categories || []).map(c => `<option value="${escapeHtml(c.slug)}">${escapeHtml(c.name)}</option>`).join('');
@@ -513,15 +803,34 @@ def render_admin() -> str:
       $('tags').value = Array.isArray(article.tags) ? article.tags.join(', ') : (article.tags || '');
       $('source_name').value = article.source_name || '';
       $('source_url').value = article.source_url || '';
+      $('attachment_url').value = article.attachment_url || '';
+      $('issue_number').value = article.issue_number || '';
+      $('cover_label').value = article.cover_label || '';
+      $('premium_required').value = String(article.premium_required || (article.category === 'dosya' ? 'true' : 'false'));
+      $('subscription_price').value = article.subscription_price || '';
+      $('subscription_tier').value = article.subscription_tier || 'dosya';
       showTab('article');
     }
-    function newArticle() {
+    function newArticle(category = 'gundem') {
       currentSlug = '';
       $('articleForm').reset();
-      $('category').value = (settings.categories && settings.categories[0] && settings.categories[0].slug) || 'gundem';
-      $('author').value = 'Turkiye Gundemi Haber Merkezi';
-      $('image').value = '/assets/images/ankara.png';
+      $('category').value = category;
+      $('author').value = category === 'dosya' ? 'Türkiye Gündemi Dosya Editörleri' : 'Türkiye Gündemi Haber Merkezi';
+      $('image').value = category === 'dosya' ? '/assets/images/dosya.png' : '/assets/images/ankara.png';
+      $('tags').value = category === 'dosya' ? 'dosya, dergi' : '';
+      $('status').value = 'draft';
+      $('premium_required').value = category === 'dosya' ? 'true' : 'false';
+      $('subscription_price').value = category === 'dosya' ? 'Aylık 99 TL' : '';
+      $('subscription_tier').value = 'dosya';
       showTab('article');
+    }
+    function newDossier() {
+      listFilter = 'dosya';
+      renderList();
+      newArticle('dosya');
+      $('cover_label').value = 'Türkiye Gündemi Dosya';
+      $('summary').placeholder = 'Dosya/dergi özetini buraya yazın.';
+      $('body').placeholder = 'Dergi içeriği, editör notu, dosya başlıkları veya PDF açıklaması.';
     }
     async function saveArticle(event) {
       event.preventDefault();
@@ -539,7 +848,13 @@ def render_admin() -> str:
         status: $('status').value,
         tags: $('tags').value,
         source_name: $('source_name').value,
-        source_url: $('source_url').value
+        source_url: $('source_url').value,
+        attachment_url: $('attachment_url').value,
+        issue_number: $('issue_number').value,
+        cover_label: $('cover_label').value,
+        premium_required: $('premium_required').value,
+        subscription_price: $('subscription_price').value,
+        subscription_tier: $('subscription_tier').value
       };
       const data = await api('/api/articles', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
       log(data);
@@ -575,37 +890,166 @@ def render_admin() -> str:
       log(data);
       showTab('output');
     }
+    async function runQualityAudit() {
+      qualityAudit = await api('/api/content-quality?site=turkiye-gundemi');
+      renderStats();
+      log(qualityAudit);
+      showTab('output');
+    }
+    async function applyQualityGate() {
+      if (!confirm('Sorunlu yayındaki haberler taslağa alınsın ve site yeniden yayınlansın mı?')) return;
+      const data = await api('/api/content-quality-apply', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({site:'turkiye-gundemi', publish_site:true})});
+      log(data);
+      await loadAll();
+      showTab('output');
+    }
+    async function repairDraftNews() {
+      const limit = Number($('newsMax').value || 20);
+      const data = await api('/api/news-repair-drafts', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({site:'turkiye-gundemi', limit, publish_site:true})});
+      log(data);
+      await loadAll();
+      showTab('output');
+    }
     async function scanNews() {
-      $('newsResults').innerHTML = '<p class="muted">Kaynaklar taraniyor...</p>';
-      scannedNews = await (await fetch('/api/news-scan?limit=' + encodeURIComponent($('newsLimit').value || '18'))).json();
+      $('newsResults').innerHTML = '<p class="muted">Kaynaklar taranıyor...</p>';
+      scannedNews = await api('/api/news-scan?limit=' + encodeURIComponent($('newsLimit').value || '90'));
       renderNewsResults(scannedNews);
     }
     function renderNewsResults(payload) {
-      const status = (payload.source_status || []).map(item => `<span class="badge ${item.status === 'error' ? 'draft' : ''}">${escapeHtml(item.source)}: ${escapeHtml(item.status)}</span>`).join(' ');
+      const sourceStatus = payload.source_status || [];
+      const status = sourceStatus.map(item => `<span class="badge ${item.status === 'error' ? 'draft' : ''}">${escapeHtml(item.source)}: ${escapeHtml(item.status)}</span>`).join(' ');
+      const diagnostic = sourceStatus.length === 0
+        ? '<p class="muted">Kaynak listesi yüklenemedi. EXE yanındaki workspace/config/news_sources.json dosyasını kontrol edin.</p>'
+        : '';
       const cards = (payload.items || []).slice(0, 12).map(item => `
         <article class="news-card">
           <div class="muted">${escapeHtml(item.source)} - ${escapeHtml(item.category)} - ${escapeHtml(item.published_at || '')}</div>
           <h3>${escapeHtml(item.title)}</h3>
           <p>${escapeHtml((item.variants && item.variants.spot) || item.summary || '')}</p>
-          <a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer">Kaynak haberi ac</a>
+          <a href="${escapeHtml(item.link)}" target="_blank" rel="noopener noreferrer">Kaynak haberi aç</a>
         </article>
       `).join('');
-      $('newsResults').innerHTML = `<div>${status}</div>${cards || '<p class="muted">Haber bulunamadi.</p>'}`;
+      $('newsResults').innerHTML = `<div>${status}</div>${diagnostic}${cards || '<p class="muted">Haber bulunamadı.</p>'}`;
     }
     async function importNews(event) {
       event.preventDefault();
       const payload = {
         site: 'turkiye-gundemi',
-        limit: Number($('newsLimit').value || 18),
-        max_items: Number($('newsMax').value || 3),
+        limit: Number($('newsLimit').value || 90),
+        max_items: Number($('newsMax').value || 6),
         status: $('newsStatus').value,
-        publish_site: $('newsPublishSite').checked
+        publish_site: $('newsPublishSite').checked,
+        enrich_images: $('newsEnrichImages').checked
       };
       const data = await api('/api/news-import', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
       log(data);
       await loadAll();
       if (data.imported && data.imported[0]) fillArticle(data.imported[0]);
       showTab('output');
+    }
+    async function enrichImages(force = false) {
+      const payload = {
+        site: 'turkiye-gundemi',
+        limit: Number($('newsLimit').value || 90),
+        publish_site: $('newsPublishSite').checked,
+        force
+      };
+      const data = await api('/api/enrich-images', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+      log(data);
+      await loadAll();
+      showTab('output');
+    }
+    async function generateRelatedImages(force = false) {
+      const payload = {
+        site: 'turkiye-gundemi',
+        publish_site: $('newsPublishSite').checked,
+        limit: Number($('newsMax').value || 20),
+        force
+      };
+      const data = await api('/api/related-images', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+      log(data);
+      await loadAll();
+      showTab('output');
+    }
+    async function healNetwork() {
+      const data = await api('/api/network-heal', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({site:'turkiye-gundemi', publish_site:$('newsPublishSite').checked, generate_dns:true})});
+      log(data);
+      showTab('output');
+    }
+    async function runAutonomousCycle() {
+      const payload = {
+        site: 'turkiye-gundemi',
+        limit: Number($('newsLimit').value || 90),
+        max_items: Number($('newsMax').value || 6),
+        status: $('newsStatus').value,
+        publish_site: $('newsPublishSite').checked,
+        enrich_images: $('newsEnrichImages').checked,
+        heal_network: true
+      };
+      const data = await api('/api/autonomous-cycle', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+      log(data);
+      await loadAll();
+      showTab('output');
+    }
+    async function loadSubscriptions() {
+      const data = await api('/api/subscriptions?site=turkiye-gundemi');
+      if (data.settings) {
+        $('subscriptionPriceLabel').value = data.settings.price_label || 'Aylık 99 TL';
+        $('subscriptionCookieDays').value = data.settings.cookie_days || 30;
+        const payment = data.settings.payment || {};
+        const plans = payment.plans || [];
+        const planById = Object.fromEntries(plans.map(plan => [plan.id, plan]));
+        $('paymentEnabled').checked = !!payment.enabled;
+        $('paymentProviderLabel').value = payment.provider_label || 'Ödeme linki';
+        $('paymentAylikUrl').value = (planById['aylik'] || {}).payment_url || '';
+        $('paymentUcAylikUrl').value = (planById['uc-aylik'] || {}).payment_url || '';
+        $('paymentYillikUrl').value = (planById['yillik'] || {}).payment_url || '';
+      }
+      const rows = (data.subscribers || []).map(item => `
+        <article class="news-card">
+          <div class="muted">${escapeHtml(item.tier || 'dosya')} - ${escapeHtml(item.status || 'active')}</div>
+          <h3>${escapeHtml(item.label || 'Dosya aboneliği')}</h3>
+          <p>Başlangıç: ${escapeHtml(item.created_at || '-')}<br>Bitiş: ${escapeHtml(item.expires_at || '-')}<br>Son kullanım: ${escapeHtml(item.last_used_at || '-')}</p>
+        </article>
+      `).join('');
+      $('subscriberList').innerHTML = rows || '<p class="muted">Henüz abonelik kodu yok.</p>';
+      return data;
+    }
+    async function createSubscription(event) {
+      event.preventDefault();
+      const payload = {
+        site: 'turkiye-gundemi',
+        label: $('subscriberLabel').value,
+        days: Number($('subscriberDays').value || 30),
+        tier: $('subscriberTier').value || 'dosya'
+      };
+      const data = await api('/api/subscription-create', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+      $('subscriptionOutput').textContent = 'Üretilen kod: ' + data.code + '\\nBitiş: ' + data.expires_at + '\\nBu kodu yalnızca ödeme yapan aboneyle paylaşın.';
+      await loadSubscriptions();
+    }
+    async function saveSubscriptionSettings() {
+      const payload = {
+        site: 'turkiye-gundemi',
+        price_label: $('subscriptionPriceLabel').value || 'Aylık 99 TL',
+        cookie_days: Number($('subscriptionCookieDays').value || 30),
+        tier: $('subscriberTier').value || 'dosya',
+        enabled: true,
+        payment: {
+          enabled: $('paymentEnabled').checked,
+          provider: 'payment_link',
+          provider_label: $('paymentProviderLabel').value || 'Ödeme linki',
+          currency: 'TRY',
+          plans: [
+            {id: 'aylik', name: 'Aylık', price_label: '99 TL', days: 30, payment_url: $('paymentAylikUrl').value},
+            {id: 'uc-aylik', name: '3 Aylık', price_label: '249 TL', days: 90, payment_url: $('paymentUcAylikUrl').value},
+            {id: 'yillik', name: 'Yıllık', price_label: '899 TL', days: 365, payment_url: $('paymentYillikUrl').value}
+          ]
+        }
+      };
+      const data = await api('/api/subscription-settings', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+      const publish = await api('/api/publish', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({site:'turkiye-gundemi'})});
+      $('subscriptionOutput').textContent = JSON.stringify({settings: data, publish}, null, 2);
+      await loadSubscriptions();
     }
     async function generateDns(event) {
       event.preventDefault();

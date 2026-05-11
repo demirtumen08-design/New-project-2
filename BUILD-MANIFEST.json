@@ -1,0 +1,31 @@
+{
+  "name": "TurkiyeGundemiApp Windows EXE Build Kit v3",
+  "contains_windows_exe": false,
+  "why_no_exe_here": "This ChatGPT environment is Linux. PyInstaller Windows exe output must be produced on Windows.",
+  "fixes": [
+    "disable UPX",
+    "force Python 3.11/3.12",
+    "add onefile fallback",
+    "include root folder in release zip",
+    "add run/debug launchers",
+    "strengthen writable workspace fallback",
+    "remove --noupx from PyInstaller commands that pass .spec files; UPX remains disabled inside spec files"
+  ],
+  "expected_windows_outputs": [
+    "dist/TurkiyeGundemiApp/TurkiyeGundemiApp.exe",
+    "release/TurkiyeGundemiApp-Windows-x64-folder.zip",
+    "release/TurkiyeGundemiApp-onefile.exe",
+    "release/TurkiyeGundemiApp-Windows-x64-final.zip"
+  ],
+  "version": "v5-autonomous-network-heal",
+  "new_features": [
+    "runtime IP detection for Linux/VirtualBox",
+    "public/local IPv4 synthesis",
+    "automatic sites.json DNS A record update",
+    "BIND zone regeneration on IP change",
+    "autonomous 7/24 daemon wrapping network heal + news import + image enrichment + publish",
+    "admin endpoints for network heal and autonomous cycle test",
+    "systemd service and timer files",
+    "runtime-synthesis.json public operational synthesis output"
+  ]
+}

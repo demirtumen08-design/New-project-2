@@ -53,12 +53,12 @@
         "primary_ns": "ns1.turkiyegundemi.com",
         "secondary_ns": "ns2.turkiyegundemi.com",
         "soa_email": "dns@turkiyegundemi.com",
-        "primary_ipv4": "176.88.74.65",
+        "primary_ipv4": "213.14.161.140",
         "secondary_ipv4": "CHANGE_ME_SECONDARY_DNS_IPV4",
         "records": [
-          {"type": "A", "name": "@", "value": "176.88.74.65"},
-          {"type": "A", "name": "www", "value": "176.88.74.65"},
-          {"type": "A", "name": "ns1", "value": "176.88.74.65"},
+          {"type": "A", "name": "@", "value": "213.14.161.140"},
+          {"type": "A", "name": "www", "value": "213.14.161.140"},
+          {"type": "A", "name": "ns1", "value": "213.14.161.140"},
           {"type": "A", "name": "ns2", "value": "SECONDARY_IPV4"},
           {"type": "TXT", "name": "@", "value": "v=spf1 -all"},
           {"type": "TXT", "name": "_dmarc", "value": "v=DMARC1; p=reject; adkim=s; aspf=s"},
@@ -79,7 +79,8 @@
         {"slug": "dunya", "name": "Dünya"},
         {"slug": "teknoloji", "name": "Teknoloji"},
         {"slug": "spor", "name": "Spor"},
-        {"slug": "kultur", "name": "Kültür"}
+        {"slug": "kultur", "name": "Kültür"},
+        {"slug": "dosya", "name": "Dosya"}
       ],
       "thresholds": {
         "homepage_html_kb": 120,
@@ -87,6 +88,24 @@
         "max_blocking_scripts": 2,
         "min_news_sitemap_urls": 20,
         "max_recent_news_age_hours": 1
+      },
+      "ads": {
+        "enabled": true,
+        "google_ads_client": "ca-pub-6711899787220301",
+        "slots": {
+          "top": "CHANGE_ME_TOP",
+          "mid": "CHANGE_ME_MID",
+          "sidebar": "CHANGE_ME_SIDEBAR",
+          "article-top": "CHANGE_ME_ARTICLE_TOP",
+          "article-bottom": "CHANGE_ME_ARTICLE_BOTTOM",
+          "category-top": "CHANGE_ME_CATEGORY_TOP",
+          "category-sidebar": "CHANGE_ME_CATEGORY_SIDEBAR"
+        }
+      },
+      "subscriptions": {
+        "enabled": true,
+        "price_label": "Aylık 99 TL",
+        "tier": "dosya"
       }
     }
   }

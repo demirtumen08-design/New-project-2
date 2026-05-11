@@ -17,8 +17,8 @@ fi
 
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install -y \
-  ca-certificates curl git rsync ufw fail2ban python3 python3-venv python3-pip \
-  nginx bind9 bind9utils dnsutils certbot python3-certbot-nginx
+  ca-certificates curl git rsync ufw fail2ban python3 python3-venv python3-pip fonts-dejavu-core \
+  nginx bind9 bind9utils dnsutils certbot python3-certbot-nginx unattended-upgrades
 
 id -u "${ADMIN_USER}" >/dev/null 2>&1 || adduser --disabled-password --gecos "" "${ADMIN_USER}"
 usermod -aG sudo "${ADMIN_USER}"
@@ -54,6 +54,7 @@ ufw allow 53/udp
 ufw --force enable
 
 systemctl enable --now fail2ban
+systemctl enable --now unattended-upgrades
 systemctl restart ssh || systemctl restart sshd
 
 public_ip="$(curl -4fsS https://api.ipify.org || true)"

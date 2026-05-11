@@ -1,0 +1,10 @@
+[Unit]
+Description=Check Growth OS IP/DNS runtime every 5 minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=5min
+Unit=growth-os-network-heal.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,61 @@
+{
+  "last_check": {
+    "ok": true,
+    "generated_at": "2026-05-08T15:55:45+03:00",
+    "site_id": "turkiye-gundemi",
+    "enabled": false,
+    "snapshot": {
+      "detected_at": "2026-05-08T15:55:45+03:00",
+      "local_ipv4": "192.168.1.30",
+      "public_ipv4": "213.14.161.140",
+      "publish_ipv4": "213.14.161.140",
+      "publish_source": "public",
+      "prefer_public_ip": true
+    },
+    "previous_publish_ipv4": "",
+    "ip_changed": true,
+    "config_update": {
+      "changed": false
+    },
+    "dns_dir": null,
+    "public_dir": null,
+    "warnings": [
+      "network_auto_repair disabled"
+    ]
+  },
+  "last_checked_at": "2026-05-08T15:57:37+03:00",
+  "last_publish_ipv4": "213.14.161.140",
+  "last_snapshot": {
+    "detected_at": "2026-05-08T15:57:37+03:00",
+    "local_ipv4": "192.168.1.30",
+    "public_ipv4": "213.14.161.140",
+    "publish_ipv4": "213.14.161.140",
+    "publish_source": "public",
+    "prefer_public_ip": true
+  },
+  "last_result": {
+    "ok": true,
+    "generated_at": "2026-05-08T15:57:37+03:00",
+    "site_id": "turkiye-gundemi",
+    "enabled": true,
+    "snapshot": {
+      "detected_at": "2026-05-08T15:57:37+03:00",
+      "local_ipv4": "192.168.1.30",
+      "public_ipv4": "213.14.161.140",
+      "publish_ipv4": "213.14.161.140",
+      "publish_source": "public",
+      "prefer_public_ip": true
+    },
+    "previous_publish_ipv4": "",
+    "ip_changed": true,
+    "config_update": {
+      "changed": false,
+      "before": "213.14.161.140",
+      "after": "213.14.161.140"
+    },
+    "dns_dir": "C:\\Users\\demir\\OneDrive\\Documents\\New project 2\\ops\\dns\\generated",
+    "public_dir": "C:\\Users\\demir\\OneDrive\\Documents\\New project 2\\sites\\turkiye-gundemi\\public",
+    "warnings": [],
+    "synthesis_path": "C:\\Users\\demir\\OneDrive\\Documents\\New project 2\\sites\\turkiye-gundemi\\public\\runtime-synthesis.json"
+  }
+}

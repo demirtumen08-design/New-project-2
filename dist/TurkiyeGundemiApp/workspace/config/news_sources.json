@@ -89,6 +89,43 @@
       "name": "Medyafaresi",
       "url": "https://www.medyafaresi.com/rss",
       "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "Diken",
+      "url": "https://www.diken.com.tr/feed/",
+      "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "BirGün",
+      "url": "https://www.birgun.net/rss/home",
+      "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "Independent Türkçe",
+      "url": "https://www.indyturk.com/rss.xml",
+      "category": "gundem"
+    },
+    {
+      "enabled": true,
+      "name": "Dünya Gazetesi",
+      "url": "https://www.dunya.com/rss",
+      "category": "ekonomi"
+    },
+    {
+      "enabled": true,
+      "name": "BBC Türkçe",
+      "url": "https://feeds.bbci.co.uk/turkce/rss.xml",
+      "category": "dunya"
+    },
+    {
+      "enabled": false,
+      "name": "T24",
+      "url": "https://t24.com.tr/rss",
+      "category": "gundem",
+      "note": "T24 RSS endpoint'i doğrulanamadığı için manuel doğrulama bekliyor."
     }
   ],
   "defaults": {
@@ -96,6 +133,19 @@
     "max_import_per_cycle": 3,
     "status": "published",
     "publish_site_after_import": true,
-    "require_live_sources": true
+    "require_live_sources": true,
+    "scan_interval_seconds": 900,
+    "source_error_cooldown_seconds": 1800,
+    "max_source_backoff_seconds": 21600,
+    "image_enrichment": false,
+    "network_auto_repair": {
+      "enabled": false,
+      "prefer_public_ip": true,
+      "update_dns_records": true,
+      "regenerate_dns_on_ip_change": true,
+      "regenerate_site_on_ip_change": true,
+      "network_check_interval_seconds": 300,
+      "secondary_ip": ""
+    }
   }
 }

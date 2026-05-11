@@ -26,6 +26,7 @@ rsync -a --delete \
 
 python3 -m venv "${APP_DIR}/venv"
 "${APP_DIR}/venv/bin/python" -m pip install --upgrade pip
+"${APP_DIR}/venv/bin/python" -m pip install "Pillow>=10,<13"
 
 if [[ ! -f /etc/growth-os/growth-os.env ]]; then
   cp "${APP_DIR}/ops/systemd/growth-os.env.example" /etc/growth-os/growth-os.env
@@ -45,8 +46,14 @@ chmod 600 /etc/growth-os/growth-os.env
 chown -R "${SERVICE_USER}:${SERVICE_USER}" "${APP_DIR}"
 
 cp "${APP_DIR}/ops/systemd/growth-os.service" /etc/systemd/system/growth-os.service
+cp "${APP_DIR}/ops/systemd/growth-os-newsbot.service" /etc/systemd/system/growth-os-newsbot.service
+cp "${APP_DIR}/ops/systemd/growth-os-newsbot.timer" /etc/systemd/system/growth-os-newsbot.timer
+cp "${APP_DIR}/ops/systemd/growth-os-operator.service" /etc/systemd/system/growth-os-operator.service
+cp "${APP_DIR}/ops/systemd/growth-os-operator.timer" /etc/systemd/system/growth-os-operator.timer
 systemctl daemon-reload
 systemctl enable --now growth-os
+systemctl enable --now growth-os-newsbot.timer
+systemctl enable --now growth-os-operator.timer
 
 if command -v nginx >/dev/null 2>&1; then
   cp "${APP_DIR}/ops/nginx/model-b-turkiyegundemi.conf" /etc/nginx/sites-available/turkiyegundemi.conf
@@ -59,5 +66,7 @@ fi
 
 echo "Model B installed."
 echo "Service: systemctl status growth-os"
+echo "News robot: systemctl status growth-os-newsbot.timer"
+echo "Production operator: systemctl status growth-os-operator.timer"
 echo "Admin user: $(grep '^GROWTH_OS_ADMIN_USER=' /etc/growth-os/growth-os.env | cut -d= -f2-)"
 echo "Admin password: sudo grep '^GROWTH_OS_ADMIN_PASSWORD=' /etc/growth-os/growth-os.env"

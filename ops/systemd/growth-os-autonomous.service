@@ -1,0 +1,21 @@
+[Unit]
+Description=Growth OS 7/24 Autonomous News Production Daemon
+After=network-online.target growth-os.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=growthos
+Group=growthos
+WorkingDirectory=/opt/growth-os
+EnvironmentFile=/etc/growth-os/growth-os.env
+ExecStart=/opt/growth-os/venv/bin/python -m src.growth_os.autonomous_daemon --site turkiye-gundemi --limit 30 --max-items 3 --status published --publish-site --no-enrich-images --no-network-heal --interval-seconds 300
+Restart=always
+RestartSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/opt/growth-os/config /opt/growth-os/content /opt/growth-os/sites /opt/growth-os/ops /opt/growth-os/reports
+
+[Install]
+WantedBy=multi-user.target

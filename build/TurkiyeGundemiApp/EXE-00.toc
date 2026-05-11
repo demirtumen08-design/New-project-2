@@ -3,7 +3,8 @@
  False,
  False,
  True,
- 'C:\\Users\\demir\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\bootloader\\images\\icon-windowed.ico',
+ 'C:\\Users\\demir\\OneDrive\\Documents\\New project '
+ '2\\.venv\\Lib\\site-packages\\PyInstaller\\bootloader\\images\\icon-windowed.ico',
  None,
  False,
  False,
@@ -58,13 +59,16 @@
    '2\\build\\TurkiyeGundemiApp\\localpycs\\pyimod04_pywin32.pyc',
    'PYMODULE'),
   ('pyiboot01_bootstrap',
-   'C:\\Users\\demir\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\loader\\pyiboot01_bootstrap.py',
+   'C:\\Users\\demir\\OneDrive\\Documents\\New project '
+   '2\\.venv\\Lib\\site-packages\\PyInstaller\\loader\\pyiboot01_bootstrap.py',
    'PYSOURCE'),
   ('pyi_rth_inspect',
-   'C:\\Users\\demir\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_inspect.py',
+   'C:\\Users\\demir\\OneDrive\\Documents\\New project '
+   '2\\.venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth_inspect.py',
    'PYSOURCE'),
   ('pyi_rth__tkinter',
-   'C:\\Users\\demir\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth__tkinter.py',
+   'C:\\Users\\demir\\OneDrive\\Documents\\New project '
+   '2\\.venv\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth__tkinter.py',
    'PYSOURCE'),
   ('launch_desktop',
    'C:\\Users\\demir\\OneDrive\\Documents\\New project 2\\launch_desktop.py',
@@ -72,8 +76,9 @@
  [],
  False,
  False,
- 1777976534,
+ 1778015897,
  [('runw.exe',
-   'C:\\Users\\demir\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\runw.exe',
+   'C:\\Users\\demir\\OneDrive\\Documents\\New project '
+   '2\\.venv\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\runw.exe',
    'EXECUTABLE')],
- 'C:\\Users\\demir\\AppData\\Local\\Python\\pythoncore-3.14-64\\python314.dll')
+ 'C:\\Users\\demir\\AppData\\Local\\Python\\pythoncore-3.12-64\\python312.dll')

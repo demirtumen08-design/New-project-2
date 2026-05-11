@@ -1,9 +1,9 @@
 [Unit]
-Description=Run Growth OS Turkiye Gundemi News Robot every 15 minutes
+Description=Run Growth OS Turkiye Gundemi News Robot every 3 minutes
 
 [Timer]
-OnBootSec=5min
-OnUnitActiveSec=15min
+OnBootSec=3min
+OnUnitActiveSec=3min
 Unit=growth-os-newsbot.service
 
 [Install]

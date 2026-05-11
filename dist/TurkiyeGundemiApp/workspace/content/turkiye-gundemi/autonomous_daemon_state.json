@@ -1,0 +1,161 @@
+{
+  "last_cycle": {
+    "ok": true,
+    "started_at": "2026-05-05T23:53:16+03:00",
+    "finished_at": "2026-05-05T23:53:21+03:00",
+    "site_id": "turkiye-gundemi",
+    "network": null,
+    "news": {
+      "ok": true,
+      "generated_at": "2026-05-05T23:53:21+03:00",
+      "imported_count": 1,
+      "skipped_count": 0,
+      "imported": [
+        {
+          "slug": "unlu-youtuber-ruhi-cenet-de-olum-gemisi-ndeymis",
+          "category": "gundem",
+          "title": "Ünlü Youtuber Ruhi Çenet de 'ölüm gemisi'ndeymiş!",
+          "summary": "Ünlü Youtuber Ruhi Çenet'in Atlantik'te ölümcül hantavirüs vakalarının görüldüğü yolcu gemisinde olduğu ortaya çıktı. Yaşadıklarını anlatan Çenet, \"Çok ucuz kurtuldum\" ifadesini kullandı.",
+          "body": [
+            "Ünlü Youtuber Ruhi Çenet'in Atlantik'te ölümcül hantavirüs vakalarının görüldüğü yolcu gemisinde olduğu ortaya çıktı. Yaşadıklarını anlatan Çenet, \"Çok ucuz kurtuldum\" ifadesini kullandı.",
+            "Arjantin'den Capo Verde'ye seyir halinde olan MV Hondius gemisinde 1 Nisan'dan bu yana 3'ü ölümle sonuçlanan toplam 7 hantavirüs vakası tespit edildi. Atlas Okyanusu üzerindeyken vakaların görüldüğü gemide, içerik üreticisi Ruhi Çenet'in de olduğu öğrenildi.",
+            "Sosyal medya hesabından yaşadıklarını anlatan Çenet, yaklaşık bir ay süren yolculuk sırasında ilk ölümün okyanus koşullarından kaynaklandığını düşündüklerini ifade etti. İlk vakadan sonra gerekli önlemlerin alınmadığını öne süren Çenet, şunları söyledi:.",
+            "\"Yaklaşık 1 ay süren gemi yolculuğumuzda aramızdan bir yolcu hayatını kaybedince bunun okyanus koşulları yüzünden olduğunu düşünmüştüm. Ancak durum zannettiğimizden çok daha kötüymüş. Ben 24'üncü günde gemiden indim ancak gemi son varış noktasına doğru 11 gün daha devam etti.",
+            "Gemiden inmemden bir gün sonra ölen kişinin karısı da vefat etti."
+          ],
+          "author": "Türkiye Gündemi Haber Merkezi",
+          "published_at": "2026-05-05T23:52:48+03:00",
+          "modified_at": "2026-05-05T23:53:21+03:00",
+          "image": "/assets/images/ankara.png",
+          "image_alt": "Ünlü Youtuber Ruhi Çenet de 'ölüm gemisi'ndeymiş!",
+          "tags": [
+            "Sözcü Gündem",
+            "gundem",
+            "sozcu gundem"
+          ],
+          "status": "draft",
+          "source_name": "Sözcü Gündem",
+          "source_url": "https://www.sozcu.com.tr/ruhi-cenet-hantavirus-gemisi-aciklamasi-p317128",
+          "source_feed": "https://www.sozcu.com.tr/feeds-rss-category-gundem",
+          "source_published_at": "2026-05-05T23:52:48+03:00",
+          "automation_signature": "d6394b5ebd2a9a2f5a9dc4622eb59b133cb80c312fd13b9a9ffb213fc2483c03",
+          "imported_at": "2026-05-05T23:53:21+03:00"
+        }
+      ],
+      "skipped": [],
+      "source_status": [
+        {
+          "source": "TRT Haber Son Dakika",
+          "status": "ok",
+          "message": "60 haber alındı"
+        },
+        {
+          "source": "TRT Haber Gündem",
+          "status": "ok",
+          "message": "60 haber alındı"
+        },
+        {
+          "source": "TRT Haber Türkiye",
+          "status": "ok",
+          "message": "60 haber alındı"
+        },
+        {
+          "source": "TRT Haber Ekonomi",
+          "status": "ok",
+          "message": "60 haber alındı"
+        },
+        {
+          "source": "TRT Haber Dünya",
+          "status": "ok",
+          "message": "60 haber alındı"
+        },
+        {
+          "source": "TRT Haber Spor",
+          "status": "ok",
+          "message": "60 haber alındı"
+        },
+        {
+          "source": "TRT Haber Bilim Teknoloji",
+          "status": "ok",
+          "message": "60 haber alındı"
+        },
+        {
+          "source": "NTV Son Dakika",
+          "status": "ok",
+          "message": "2 haber alındı"
+        },
+        {
+          "source": "Sözcü Son Dakika",
+          "status": "ok",
+          "message": "31 haber alındı"
+        },
+        {
+          "source": "Sözcü Gündem",
+          "status": "ok",
+          "message": "50 haber alındı"
+        },
+        {
+          "source": "Sözcü Ekonomi",
+          "status": "ok",
+          "message": "50 haber alındı"
+        },
+        {
+          "source": "Cumhuriyet",
+          "status": "ok",
+          "message": "100 haber alındı"
+        },
+        {
+          "source": "Habertürk",
+          "status": "ok",
+          "message": "98 haber alındı"
+        },
+        {
+          "source": "Ensonhaber Gündem",
+          "status": "ok",
+          "message": "25 haber alındı"
+        },
+        {
+          "source": "Medyafaresi",
+          "status": "ok",
+          "message": "50 haber alındı"
+        },
+        {
+          "source": "Diken",
+          "status": "ok",
+          "message": "30 haber alındı"
+        },
+        {
+          "source": "BirGün",
+          "status": "ok",
+          "message": "111 haber alındı"
+        },
+        {
+          "source": "Independent Türkçe",
+          "status": "ok",
+          "message": "10 haber alındı"
+        },
+        {
+          "source": "Dünya Gazetesi",
+          "status": "ok",
+          "message": "25 haber alındı"
+        },
+        {
+          "source": "BBC Türkçe",
+          "status": "ok",
+          "message": "23 haber alındı"
+        }
+      ],
+      "public_dir": null
+    },
+    "error": ""
+  },
+  "history": [
+    {
+      "finished_at": "2026-05-05T23:53:21+03:00",
+      "ok": true,
+      "ip_changed": false,
+      "imported_count": 1,
+      "error": ""
+    }
+  ]
+}
